@@ -13,7 +13,7 @@ Each result description is followed by its constituent manuscripts and their abs
 <tbody><tr>
 <td>
 
-**001. The maximum number of non-equivalent ancestral configurations.** *Mathematical biology (phylogenetics); enumerative combinatorics.* Proves the conjecture of Disanto and Rosenberg (Bull. Math. Biol. 2019) that the maximum number of non-equivalent root ancestral configurations of a matching gene tree / species tree pair with <i>n</i> ≥ 2 leaves is ⌊3<sup>⌊<i>n</i>/3⌋</sup>(2<i>r</i><sup>2</sup>+8<i>r</i>+23)/27⌋, <i>r</i> = <i>n</i> mod 3. The maximizing shape is unique for <i>n</i> ≥ 9, the growth constant is 3<sup>1/3</sup>, and the minimum is <i>n</i> − 1. Formalized in Lean (two independent proofs).
+**001. The maximum number of non-equivalent ancestral configurations.** *Mathematical biology (phylogenetics); enumerative combinatorics.* Proves the conjecture of Disanto and Rosenberg (Bull. Math. Biol. 2019) that the maximum number of non-equivalent root ancestral configurations of a matching gene tree / species tree pair with <i>n</i> ≥ 2 leaves is ⌊3<sup>⌊<i>n</i>/3⌋</sup>(2<i>r</i><sup>2</sup>+8<i>r</i>+23)/27⌋, <i>r</i> = <i>n</i> mod 3. The maximizing shape is unique for <i>n</i> ≥ 9, the growth constant is 3<sup>1/3</sup>, and the minimum is <i>n</i> − 1. Formalized in Lean (two independent proofs), starting from the paper's original definition of ancestral configurations.
 
 </td>
 </tr></tbody>

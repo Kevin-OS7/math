@@ -7,6 +7,10 @@ Every line should read `[propext, Classical.choice, Quot.sound]`. -/
 #print axioms KOS.AncestralConfigurations.disanto_rosenberg
 #print axioms KOS.AncestralConfigurations.disanto_rosenberg_unique
 #print axioms KOS.AncestralConfigurations.disanto_rosenberg_minimum
+#print axioms KOS.AncestralConfigurations.disanto_rosenberg_paper
+#print axioms KOS.AncestralConfigurations.paperRootConfigsNonequiv_eq_rootConfigs
+#print axioms KOS.AncestralConfigurations.disanto_rosenberg_realizations
+#print axioms KOS.AncestralConfigurations.realizationConfigs_eq_configsAt
 #print axioms KOS.AncestralConfigurationsIndependent.disanto_rosenberg
 #print axioms KOS.AncestralConfigurationsIndependent.disanto_rosenberg_unique
 #print axioms KOS.AncestralConfigurationsIndependent.disanto_rosenberg_unique_shape

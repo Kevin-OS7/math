@@ -1,4 +1,5 @@
 import KOS.Phylogenetics.AncestralConfigurations.Main
 import KOS.Phylogenetics.AncestralConfigurations.Independent
+import KOS.Phylogenetics.AncestralConfigurations.PaperDefinitions
 import KOS.NumberTheory.OEIS.A100475
 import KOS.Phylogenetics.LabeledHistories.Main

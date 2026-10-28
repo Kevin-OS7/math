@@ -45,6 +45,12 @@ status:
     - declaration: KOS.AncestralConfigurations.disanto_rosenberg_minimum
       file: KOS/Phylogenetics/AncestralConfigurations/Main.lean
 
+    - declaration: KOS.AncestralConfigurations.disanto_rosenberg_paper
+      file: KOS/Phylogenetics/AncestralConfigurations/PaperDefinitions.lean
+
+    - declaration: KOS.AncestralConfigurations.disanto_rosenberg_realizations
+      file: KOS/Phylogenetics/AncestralConfigurations/PaperDefinitions.lean
+
     - declaration: KOS.AncestralConfigurationsIndependent.disanto_rosenberg
       file: KOS/Phylogenetics/AncestralConfigurations/Independent.lean
 

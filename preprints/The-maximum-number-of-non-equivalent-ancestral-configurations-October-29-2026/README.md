@@ -12,6 +12,7 @@ Two independent Lean 4 proofs of the same fixed statement (see [`lean/`](../../l
 - [`lean/KOS/Phylogenetics/AncestralConfigurations/Main.lean`](../../lean/KOS/Phylogenetics/AncestralConfigurations/Main.lean): `KOS.AncestralConfigurations.disanto_rosenberg`, `…_unique`, `…_minimum`
 - [`lean/KOS/Phylogenetics/AncestralConfigurations/Independent.lean`](../../lean/KOS/Phylogenetics/AncestralConfigurations/Independent.lean): `KOS.AncestralConfigurationsIndependent.disanto_rosenberg`, `…_unique`, `…_unique_shape`, `…_min`
 - Statement: [`lean/ComparatorChallenges/AncestralConfigurations.lean`](../../lean/ComparatorChallenges/AncestralConfigurations.lean)
+- The paper's own definitions: [`lean/KOS/Phylogenetics/AncestralConfigurations/PaperDefinitions.lean`](../../lean/KOS/Phylogenetics/AncestralConfigurations/PaperDefinitions.lean) defines ancestral configurations through realizations of the gene tree (Sect. 2.3 of Disanto–Rosenberg), the restriction $t_\kappa(X)$ and the equivalence of Sect. 3.1 literally, proves that the resulting count $c^*(r)$ equals `rootConfigs`, and restates the theorem as `KOS.AncestralConfigurations.disanto_rosenberg_paper` and `…disanto_rosenberg_realizations`. See [`PAPER_DEFINITIONS.md`](../../lean/KOS/Phylogenetics/AncestralConfigurations/PAPER_DEFINITIONS.md) for a definition-by-definition comparison with the paper.
 
 ## Supporting computations
 

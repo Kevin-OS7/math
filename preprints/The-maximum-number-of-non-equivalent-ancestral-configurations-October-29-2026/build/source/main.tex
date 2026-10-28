@@ -48,7 +48,7 @@ and verified this for $n\le 20$.
 We prove the conjecture for all $n$.
 We further show that for every $n\ge 9$ the maximizing tree shape is unique, and identify it; that the exponential growth constant of the maximum is exactly $3^{1/3}$, which settles the value of a constant left undetermined by Disanto and Rosenberg; and that the minimum of $\cstar(T)$ is $n-1$, attained by exactly two tree shapes for every $n\ge 4$.
 The proof rests on an exact product formula for the number of pruned shapes of a tree together with an elementary but delicate arithmetic inequality.
-The main theorem, the uniqueness statement and the lower bound $n-1$ have been formally verified in the Lean~4 proof assistant with the Mathlib library.
+The main theorem, the uniqueness statement and the lower bound $n-1$ have been formally verified in the Lean~4 proof assistant with the Mathlib library, starting from the original definition of ancestral configurations through realizations of the gene tree.
 \end{abstract}
 
 \maketitle
@@ -119,7 +119,7 @@ where $F(1)=0$ and $F(n)=f(n)$ for $n\ge 2$.
 Formula~\eqref{eq:product} generalizes \cite[eq.~(9)]{DR2019}, which covers the case where one subtree is displayed in the other.
 
 \subsection*{Formal verification}
-Theorems~\ref{thm:main} and \ref{thm:unique} and the inequality $\cstar(T)\ge n-1$ of Proposition~\ref{prop:min} have been formalized and machine-checked in Lean~4 \cite{Lean4} using Mathlib \cite{Mathlib}; see Section~\ref{sec:lean}.
+Theorems~\ref{thm:main} and \ref{thm:unique} and the inequality $\cstar(T)\ge n-1$ of Proposition~\ref{prop:min} have been formalized and machine-checked in Lean~4 \cite{Lean4} using Mathlib \cite{Mathlib}, as has the reduction of Lemma~\ref{lem:reduction} from the definitions of \cite{DR2019}; see Section~\ref{sec:lean}.
 
 \section{Trees, cuts and prunings}\label{sec:prunings}
 
@@ -360,7 +360,10 @@ In particular the base cases $9\le n\le 14$ of Theorem~\ref{thm:unique} are cove
 The formal proof follows Sections~\ref{sec:prunings}--\ref{sec:unique}, with two technical differences.
 Shapes are represented by a complete numerical invariant: the code of $\lf$ is $0$ and the code of $[x,y]$ is $\pi(\min,\max)+1$, where $\pi$ is the Cantor pairing function applied to the codes of $x$ and $y$; isomorphism of trees is proved equivalent to equality of codes.
 Lemma~\ref{lem:arith} is proved by reducing to $1\le a,b\le 11$, using $F(n+3)=3F(n)$ for $n\ge 9$ and the fact that the correction term $\binom{\min(a,b,3)}{2}$ does not change when $b\ge 3$ is replaced by $b+3$, followed by a finite check by \texttt{decide}.
-The trusted part of the formalization consists of the displayed definitions; their agreement with the definitions of \cite{DR2019} is the content of Lemma~\ref{lem:reduction} and of the recursion~\eqref{eq:recursion}.
+The reduction of Lemma~\ref{lem:reduction} is formalized as well (file \texttt{PaperDefinitions.lean}).
+There, ancestral configurations are defined as in \cite[Sect.~2.3]{DR2019}: a realization of the matching gene tree in a species tree with speciation times $\sigma$ is given by coalescence times $\tau$ with $\tau(v)>\sigma(v)$ at every internal node $v$ and $\tau$ increasing towards the root, and the configuration at a node $\kappa$ consists of the lineages below $\kappa$ that are present just before $\kappa$, i.e.\ with $\tau(u)<\sigma(\kappa)\le\tau(\mathrm{parent}(u))$.
+The formalization proves that these configurations satisfy the decomposition of \cite[Sect.~2.4]{DR2019} and the count of \cite[eq.~(5)]{DR2019}, defines the restriction $t_\kappa(X)$ and the equivalence of \cite[Sect.~3.1]{DR2019} literally, proves that the number of equivalence classes of root configurations equals $s(T)-1$ for every choice of speciation times, and restates Theorem~\ref{thm:main} in these terms (\texttt{disanto\_rosenberg\_paper}, \texttt{disanto\_rosenberg\_realizations}); it also reproduces the worked examples of \cite[Figs.~1, 2 and 5]{DR2019}.
+What remains informal is only the modeling of the coalescent scenarios themselves by the inequalities on $\tau$ and $\sigma$ above.
 
 \section{Concluding remarks}\label{sec:remarks}
 
