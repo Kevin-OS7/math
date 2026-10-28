@@ -1,0 +1,14 @@
+name = "kos"
+defaultTargets = ["KOS"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.33.1"
+
+[[lean_lib]]
+name = "KOS"
+
+[[lean_lib]]
+name = "ComparatorChallenges"
+globs = ["ComparatorChallenges.+"]

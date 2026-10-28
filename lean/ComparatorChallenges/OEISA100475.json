@@ -1,0 +1,14 @@
+{
+  "challenge_module": "ComparatorChallenges.OEISA100475",
+  "solution_module": "KOS.NumberTheory.OEIS.A100475",
+  "theorem_names": [
+    "OeisA100475.not_conjecture"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

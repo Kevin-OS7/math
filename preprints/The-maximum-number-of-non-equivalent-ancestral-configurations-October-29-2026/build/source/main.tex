@@ -1,0 +1,427 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[no-math]{fontspec}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.82]
+\usepackage[margin=1.1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyvrb}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\lf}{\lambda}
+\newcommand{\Sh}{\mathcal{S}}
+\newcommand{\Prn}{\mathcal{P}}
+\newcommand{\cstar}{c^{*}}
+\newcommand{\join}[2]{[#1,#2]}
+\newcommand{\binomtwo}[1]{\tbinom{#1}{2}}
+\DeclareMathOperator{\shape}{sh}
+
+\title[Non-equivalent ancestral configurations]{The maximum number of non-equivalent ancestral configurations:\\ a proof of a conjecture of Disanto and Rosenberg}
+
+\author{Claude Opus 5.5}
+\author{GPT-6-Astra}
+\author{Claude Fable 5.1}
+\thanks{The authors are AI models: Claude Opus~5.5 and Claude Fable~5.1 (Anthropic) and GPT-6-Astra (OpenAI). Source files and Lean code: \url{https://github.com/Kevin-OS7/math}.}
+
+\date{October 29, 2026}
+
+\begin{document}
+
+\begin{abstract}
+Ancestral configurations are the combinatorial objects that underlie the computation of gene tree probabilities under the multispecies coalescent.
+For a species tree with $n$ leaves and a gene tree of the same labeled topology, Disanto and Rosenberg (Bull.\ Math.\ Biol.\ 2019) studied the number $\cstar(T)$ of \emph{non-equivalent} root ancestral configurations, i.e.\ root configurations counted up to isomorphism of the tree shapes they induce.
+They conjectured that the maximum of $\cstar(T)$ over all tree shapes $T$ with $n\ge 2$ leaves equals
+\[
+\Bigl\lfloor \tfrac{1}{27}\,3^{\lfloor n/3\rfloor}\bigl(2r^2+8r+23\bigr)\Bigr\rfloor,\qquad r=n-3\lfloor n/3\rfloor,
+\]
+and verified this for $n\le 20$.
+We prove the conjecture for all $n$.
+We further show that for every $n\ge 9$ the maximizing tree shape is unique, and identify it; that the exponential growth constant of the maximum is exactly $3^{1/3}$, which settles the value of a constant left undetermined by Disanto and Rosenberg; and that the minimum of $\cstar(T)$ is $n-1$, attained by exactly two tree shapes for every $n\ge 4$.
+The proof rests on an exact product formula for the number of pruned shapes of a tree together with an elementary but delicate arithmetic inequality.
+The main theorem, the uniqueness statement and the lower bound $n-1$ have been formally verified in the Lean~4 proof assistant with the Mathlib library.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Under the multispecies coalescent model, the probability of a gene tree topology given a species tree can be computed by dynamic programming over \emph{ancestral configurations}: the sets of gene lineages that can be present at the nodes of the species tree \cite{Wu2012}.
+The number of ancestral configurations therefore governs the cost of such computations, and its combinatorics has been studied in a series of papers by Disanto, Rosenberg and coauthors \cite{DR2017,DR2019,DFPR2022,DFHPR2024,LR2024}.
+
+For a \emph{matching} gene tree and species tree (the two have the same labeled topology), Disanto and Rosenberg \cite{DR2017} enumerated the root ancestral configurations and showed that their maximum number over trees with $n$ leaves grows like $k_0^{\,n}$ with $k_0\approx 1.5028$.
+In \cite{DR2019} they considered a coarser count suggested by Wu's algorithm \cite{Wu2012}: two configurations at a node $\kappa$ are \emph{equivalent} if the tree shapes obtained by cutting the subtree at $\kappa$ along the two configurations are isomorphic.
+Writing $\cstar(T)$ for the number of non-equivalent root configurations when the species tree has unlabeled shape $T$, they exhibited a family of shapes $u_n$ with
+\[
+\cstar(u_n)=\Bigl\lfloor 3^{\lfloor n/3\rfloor}\tfrac{2r^2+8r+23}{27}\Bigr\rfloor,\qquad r=n-3\lfloor n/3\rfloor,
+\]
+found by exhaustive computation that $u_n$ attains the maximum for $2\le n\le 20$, and stated the following conjecture \cite[Sect.~4.3, after eq.~(16)]{DR2019}.
+
+\begin{conjecture}[Disanto--Rosenberg]\label{conj:DR}
+For every $n\ge 2$,
+\[
+M_n:=\max_{|T|=n}\cstar(T)=f(n):=\Bigl\lfloor \frac{3^{\lfloor n/3\rfloor}\,(2r^2+8r+23)}{27}\Bigr\rfloor,\qquad r=n\bmod 3 .
+\]
+\end{conjecture}
+
+They also proved $3^{n/3}\ll M_n\ll k_0^{\,n}$, so that the growth constant $k_1^*=\lim M_n^{1/n}$ (if it exists) satisfies $3^{1/3}\le k_1^*\le k_0\approx 1.5028$, and remarked that they ``did not prove a general result describing the unlabeled shapes of trees that give rise to the most non-equivalent root configurations'' \cite[Sect.~6]{DR2019}.
+
+\subsection*{Results}
+We prove Conjecture~\ref{conj:DR} and describe the extremal trees.
+Let $\lf$ denote the one-leaf tree, $[x,y]$ the (unordered) tree whose root has subtrees $x$ and $y$, $\kappa_2=[\lf,\lf]$ and $\kappa_3=[\lf,\kappa_2]$.
+Define shapes $u_n$ by $u_1=\lf$, $u_2=\kappa_2$, $u_3=\kappa_3$, $u_4=[\lf,\kappa_3]$ and, for $n\ge 5$,
+\[
+u_n=\begin{cases}[\kappa_2,u_{n-2}] & n\in\{5,6,7,8,9,11\},\\ [\kappa_3,u_{n-3}] & n=10 \text{ or } n\ge 12.\end{cases}
+\]
+(For $n\ge 9$ these are the trees of \cite[Sect.~3.2 and eq.~(14)]{DR2019}.)
+
+\begin{theorem}\label{thm:main}
+For every $n\ge 2$ we have $M_n=f(n)$, and $\cstar(u_n)=f(n)$.
+\end{theorem}
+
+\begin{theorem}\label{thm:unique}
+For every $n\ge 9$, $u_n$ is the only tree shape with $n$ leaves satisfying $\cstar(T)=M_n$.
+\end{theorem}
+
+\begin{corollary}\label{cor:growth}
+For $n\ge 9$, $M_n=C_r\,3^{(n-r)/3-3}$ with $(C_0,C_1,C_2)=(23,33,47)$ and $r=n\bmod 3$; in particular $M_{n+3}=3M_n$ for $n\ge 9$ and $\lim_{n\to\infty} M_n^{1/n}=3^{1/3}$.
+Thus the growth constant $k_1^*$ of \cite{DR2019} equals $3^{1/3}\approx 1.4422$.
+\end{corollary}
+
+\begin{proposition}\label{prop:min}
+For every tree shape $T$ with $n$ leaves, $\cstar(T)\ge n-1$.
+Equality holds for exactly one shape when $n\le 3$ and for exactly two shapes when $n\ge 4$: the caterpillar, and the tree obtained from the caterpillar with $n-2$ leaves by replacing its cherry with the balanced tree $[\kappa_2,\kappa_2]$.
+\end{proposition}
+
+Proposition~\ref{prop:min} complements the observation in \cite[Sect.~3.2]{DR2019} that, for $n\le 20$, the caterpillar minimizes $\cstar$: the minimum value is $n-1$ for all $n$, and for $n\ge 4$ the caterpillar is not the only minimizer.
+
+\subsection*{Method}
+The key observation (Section~\ref{sec:prunings}) is that $\cstar(T)+1$ is the number $s(T)$ of distinct shapes of \emph{prunings} of $T$, and that for $T=[L,R]$
+\begin{equation}\label{eq:product}
+s(T)=1+s(L)\,s(R)-\binomtwo{k},\qquad k=\bigl|\Sh(L)\cap\Sh(R)\bigr|,
+\end{equation}
+where $\Sh(\cdot)$ denotes the set of pruned shapes.
+Every tree with at least three leaves has $\lf,\kappa_2,\kappa_3$ among its pruned shapes, so $k\ge\min(|L|,|R|,3)$.
+Theorem~\ref{thm:main} then reduces to the arithmetic inequality of Lemma~\ref{lem:arith},
+\[
+\bigl(F(a)+1\bigr)\bigl(F(b)+1\bigr)-\binomtwo{\min(a,b,3)}\le F(a+b)\qquad(a,b\ge 1),
+\]
+where $F(1)=0$ and $F(n)=f(n)$ for $n\ge 2$.
+Formula~\eqref{eq:product} generalizes \cite[eq.~(9)]{DR2019}, which covers the case where one subtree is displayed in the other.
+
+\subsection*{Formal verification}
+Theorems~\ref{thm:main} and \ref{thm:unique} and the inequality $\cstar(T)\ge n-1$ of Proposition~\ref{prop:min} have been formalized and machine-checked in Lean~4 \cite{Lean4} using Mathlib \cite{Mathlib}; see Section~\ref{sec:lean}.
+
+\section{Trees, cuts and prunings}\label{sec:prunings}
+
+All trees are rooted binary trees in which every internal node has exactly two children; $|T|$ denotes the number of leaves.
+Two trees are isomorphic if they are equal up to exchanging the two children at some internal nodes; a \emph{shape} is an isomorphism class.
+For shapes $x,y$ we write $[x,y]=[y,x]$ for the shape whose root subtrees have shapes $x$ and $y$.
+A shape with at least two leaves determines the unordered pair (multiset) $\{x,y\}$ of its root subtrees.
+
+\begin{definition}
+A \emph{cut} of $T$ is a set $X$ of nodes of $T$ such that every path from the root $\rho$ to a leaf contains exactly one node of $X$.
+The \emph{pruning} $T|_X$ is obtained from $T$ by deleting all nodes strictly below the nodes of $X$ (so the nodes of $X$ become the leaves of $T|_X$).
+We write $\Prn(T)$ for the set of prunings of $T$, $\Sh(T)$ for the set of their shapes, and $s(T)=|\Sh(T)|$.
+\end{definition}
+
+\begin{lemma}[Reduction]\label{lem:reduction}
+Let the species tree and the matching gene tree have shape $T$.
+Then the number of non-equivalent root ancestral configurations in the sense of \cite{DR2019} is $\cstar(T)=s(T)-1$.
+\end{lemma}
+
+\begin{proof}
+For a matching pair, the gene lineages present at a node $\kappa$ of the species tree are identified with nodes of the gene tree $=$ species tree, and the root configurations are precisely the sets of gene lineages entering the root from its two child branches.
+From the left child branch either the single lineage of the left child $\rho_\ell$ enters (all coalescences in the left clade have occurred), or a configuration at $\rho_\ell$ enters; by induction, the configurations at a node $\kappa$ are exactly the cuts of the subtree $T_\kappa$ different from $\{\kappa\}$.
+This is the content of the recursion $c(\rho)=[c(\rho_\ell)+1][c(\rho_r)+1]$, $c(\text{leaf})=0$, of \cite[eq.~(5)]{DR2019} (see also \cite[Sect.~2]{DR2017}).
+Hence root configurations correspond bijectively to the cuts $X\neq\{\rho\}$ of $T$.
+By definition \cite[Sect.~3.1]{DR2019}, two configurations are equivalent if and only if the restricted shapes obtained by ``removing from $T$ all nodes that remain strictly below'' the configuration are isomorphic, i.e.\ if and only if $T|_X$ and $T|_{X'}$ have the same shape.
+The cut $\{\rho\}$ yields $\lf$, and every other cut has at least two elements, so its pruning is not $\lf$.
+Therefore $\cstar(T)=|\Sh(T)\setminus\{\lf\}|=s(T)-1$.
+\end{proof}
+
+The cuts of $\lf$ are $\{\lf\}$; the cuts of $T=[L,R]$ are $\{\rho\}$ and the sets $X_L\cup X_R$ with $X_L,X_R$ cuts of $L,R$; and $T|_{X_L\cup X_R}=[L|_{X_L},R|_{X_R}]$.
+Hence
+\begin{equation}\label{eq:recursion}
+\Sh(\lf)=\{\lf\},\qquad \Sh([L,R])=\{\lf\}\cup\bigl\{[x,y]: x\in\Sh(L),\ y\in\Sh(R)\bigr\}.
+\end{equation}
+
+\begin{lemma}[Product formula]\label{lem:product}
+For $T=[L,R]$ and $k=|\Sh(L)\cap\Sh(R)|$ we have $s(T)=1+s(L)s(R)-\binomtwo{k}$.
+\end{lemma}
+
+\begin{proof}
+By \eqref{eq:recursion}, $s(T)-1$ is the number of distinct shapes $[x,y]$ with $(x,y)\in\Sh(L)\times\Sh(R)$, none of which is $\lf$.
+Since $[x,y]$ determines the multiset $\{x,y\}$, two pairs $(x,y)\neq(x',y')$ give the same shape if and only if $x'=y$, $y'=x$ and $x\neq y$; in that case both $x$ and $y$ lie in $\Sh(L)\cap\Sh(R)$.
+Conversely, every $2$-element subset $\{x,y\}\subseteq\Sh(L)\cap\Sh(R)$ arises from exactly the two pairs $(x,y)$ and $(y,x)$.
+So the map $(x,y)\mapsto[x,y]$ is two-to-one over the $\binomtwo{k}$ such subsets and one-to-one elsewhere, giving $s(T)-1=s(L)s(R)-\binomtwo{k}$.
+\end{proof}
+
+\begin{lemma}[Small prunings]\label{lem:small}
+If $|T|=m$, then for every $1\le j\le m$ the set $\Sh(T)$ contains a shape with exactly $j$ leaves.
+The shapes with $1,2,3$ leaves are exactly $\lf,\kappa_2,\kappa_3$.
+Consequently, for $T=[L,R]$ we have $|\Sh(L)\cap\Sh(R)|\ge\min(|L|,|R|,3)$.
+\end{lemma}
+
+\begin{proof}
+The set of leaves is a cut with $T|_X=T$.
+If $T|_X$ has $j\ge 2$ leaves, it contains two sibling leaves $u,v$ with parent $p$; then $(X\setminus\{u,v\})\cup\{p\}$ is a cut whose pruning has $j-1$ leaves.
+The second statement is clear, and the third follows from the first two.
+\end{proof}
+
+\section{An arithmetic inequality}\label{sec:arith}
+
+Let $F(1)=0$ and $F(n)=f(n)$ for $n\ge 2$ (note that the formula for $f$ would give $f(1)=1$).
+The first values are
+\[
+\bigl(F(1),\dots,F(11)\bigr)=(0,1,2,3,5,7,11,15,23,33,47).
+\]
+For $n=3m+r\ge 9$ ($0\le r\le 2$) the floor is not needed:
+\begin{equation}\label{eq:closed}
+F(n)=C_r\,3^{m-3},\qquad (C_0,C_1,C_2)=(23,33,47).
+\end{equation}
+In particular $F(n)=3F(n-3)$ for $n\ge 12$, and one checks $F(10)=3F(7)$ and $F(n)=2F(n-2)+1$ for $n\in\{5,6,7,8,9,11\}$.
+
+\begin{lemma}\label{lem:arith}
+For all integers $a,b\ge 1$,
+\begin{equation}\label{eq:arith}
+\bigl(F(a)+1\bigr)\bigl(F(b)+1\bigr)-\binomtwo{\min(a,b,3)}\ \le\ F(a+b).
+\end{equation}
+Moreover, if $a\le b$ and $a+b\ge 15$, equality holds if and only if $a=3$.
+\end{lemma}
+
+\begin{proof}
+By symmetry assume $a\le b$.
+
+\emph{Case 1: $a\ge 9$.}
+Write $a=3m_a+r_a$, $b=3m_b+r_b$, $X=3^{m_a-3}\ge1$, $Y=3^{m_b-3}\ge 1$.
+By \eqref{eq:closed} the left side of \eqref{eq:arith} equals $C_{r_a}C_{r_b}XY+C_{r_a}X+C_{r_b}Y-2$, while the right side equals $27\cdot 3^{c}\,C_{r'}XY$, where $r'\equiv r_a+r_b\pmod 3$, $0\le r'\le2$, and $c=\lfloor (r_a+r_b)/3\rfloor$.
+The difference $D=27\cdot 3^{c}C_{r'}-C_{r_a}C_{r_b}$ equals
+\[
+92,\ 132,\ 188,\ 180,\ 312,\ 464\quad\text{for}\quad (r_a,r_b)=(0,0),(0,1),(0,2),(1,1),(1,2),(2,2),
+\]
+which exceeds $C_{r_a}+C_{r_b}\in\{46,56,70,66,80,94\}$ respectively.
+Since $C_{r_a}X+C_{r_b}Y\le(C_{r_a}+C_{r_b})XY<D\,XY$, the inequality \eqref{eq:arith} is strict.
+
+\emph{Case 2: $a\le 8<9\le b$.}
+Write $b=3m+r$ and $Y=3^{m-3}\ge 1$.
+Then $a+b\ge 10$ and, by \eqref{eq:closed}, both sides of \eqref{eq:arith} are affine in $Y$: the left side is $\alpha Y+\beta$ and the right side is $\gamma Y$, where
+\[
+\alpha=(F(a)+1)C_r,\qquad \beta=F(a)+1-\binomtwo{\min(a,3)},\qquad \gamma=C_{r'}\,3^{\lfloor (a+r)/3\rfloor},\quad r'=(a+r)\bmod 3.
+\]
+Table~\ref{tab:case2} lists these numbers.
+In all $24$ cases $\gamma-\alpha\ge\beta\ge0$, hence $\gamma Y-\alpha Y-\beta\ge(\gamma-\alpha)-\beta\ge 0$.
+Equality forces $\gamma-\alpha=\beta$ and either $\beta=0$ or $Y=1$; by the table this happens only for $a=3$ (all $b$), or for $(a,b)\in\{(2,9),(5,9)\}$, which have $a+b<15$.
+
+\emph{Case 3: $a\le b\le 8$.}
+This is a finite check of $36$ cases; equality occurs exactly for $(a,b)\in\{(1,1),(1,2),(1,3),(2,2),(2,3),(2,4),(2,5),(2,6),(3,5),(2,7),(3,7),(5,5),(5,7),(7,7)\}$, none of which has $a+b\ge 15$ (for instance $(a,b)=(7,8)$ gives $189<207$ and $(8,8)$ gives $253<297$).
+\end{proof}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{ccc|ccc|ccc|ccc}
+\toprule
+& & & \multicolumn{3}{c|}{$r=0$} & \multicolumn{3}{c|}{$r=1$} & \multicolumn{3}{c}{$r=2$}\\
+$a$ & $F(a)$ & $\beta$ & $\alpha$ & $\gamma$ & $\gamma-\alpha$ & $\alpha$ & $\gamma$ & $\gamma-\alpha$ & $\alpha$ & $\gamma$ & $\gamma-\alpha$\\
+\midrule
+1 & 0 & 1 & 23 & 33 & 10 & 33 & 47 & 14 & 47 & 69 & 22 \\
+2 & 1 & 1 & 46 & 47 & 1 & 66 & 69 & 3 & 94 & 99 & 5 \\
+3 & 2 & 0 & 69 & 69 & 0 & 99 & 99 & 0 & 141 & 141 & 0 \\
+4 & 3 & 1 & 92 & 99 & 7 & 132 & 141 & 9 & 188 & 207 & 19 \\
+5 & 5 & 3 & 138 & 141 & 3 & 198 & 207 & 9 & 282 & 297 & 15 \\
+6 & 7 & 5 & 184 & 207 & 23 & 264 & 297 & 33 & 376 & 423 & 47 \\
+7 & 11 & 9 & 276 & 297 & 21 & 396 & 423 & 27 & 564 & 621 & 57 \\
+8 & 15 & 13 & 368 & 423 & 55 & 528 & 621 & 93 & 752 & 891 & 139 \\
+\bottomrule
+\end{tabular}
+\medskip
+\caption{The constants of Case~2 in the proof of Lemma~\ref{lem:arith} ($b=3m+r\ge 9$).}
+\label{tab:case2}
+\end{table}
+
+\section{Proof of Theorem~\ref{thm:main}}\label{sec:main}
+
+\begin{proposition}[Upper bound]\label{prop:upper}
+Every tree $T$ satisfies $s(T)\le F(|T|)+1$.
+Hence $\cstar(T)\le f(n)$ whenever $|T|=n\ge 2$.
+\end{proposition}
+
+\begin{proof}
+Induction on $T$.
+For $T=\lf$, $s(T)=1=F(1)+1$.
+For $T=[L,R]$ with $a=|L|$, $b=|R|$, Lemmas~\ref{lem:product} and \ref{lem:small} and the induction hypothesis give
+\[
+s(T)=1+s(L)s(R)-\binomtwo{k}\le 1+(F(a)+1)(F(b)+1)-\binomtwo{\min(a,b,3)}\le 1+F(a+b),
+\]
+using that $k\mapsto\binomtwo{k}$ is nondecreasing and $k\ge\min(a,b,3)$, and Lemma~\ref{lem:arith} in the last step.
+The second statement follows from Lemma~\ref{lem:reduction}.
+\end{proof}
+
+\begin{proposition}[Lower bound]\label{prop:lower}
+$s(u_n)=F(n)+1$ for all $n\ge 1$; hence $\cstar(u_n)=f(n)$ for $n\ge 2$.
+\end{proposition}
+
+\begin{proof}
+Directly, $s(u_1)=1$, $s(u_2)=2$, $s(u_3)=3$ and $s(u_4)=4$.
+If $|X|\ge 2$, then $\Sh(\kappa_2)=\{\lf,\kappa_2\}\subseteq\Sh(X)$ by Lemma~\ref{lem:small}, so $k=2$ in Lemma~\ref{lem:product} and $s([\kappa_2,X])=1+2s(X)-1=2s(X)$.
+If $|X|\ge 3$, then $\Sh(\kappa_3)=\{\lf,\kappa_2,\kappa_3\}\subseteq\Sh(X)$, so $k=3$ and $s([\kappa_3,X])=3s(X)-2$.
+Since $F(n)+1=2(F(n-2)+1)$ for $n\in\{5,6,7,8,9,11\}$ and $F(n)+1=3(F(n-3)+1)-2$ for $n=10$ and $n\ge 12$, induction gives $s(u_n)=F(n)+1$.
+\end{proof}
+
+Propositions~\ref{prop:upper} and \ref{prop:lower} prove Theorem~\ref{thm:main}, and Corollary~\ref{cor:growth} follows from \eqref{eq:closed}.
+The values $M_2,\dots,M_{20}$, namely 1, 2, 3, 5, 7, 11, 15, 23, 33, 47, 69, 99, 141, 207, 297, 423, 621, 891, 1269, agree with the exhaustive computation of \cite[Fig.~5]{DR2019}.
+
+\section{Uniqueness of the maximizer}\label{sec:unique}
+
+\begin{proof}[Proof of Theorem~\ref{thm:unique}]
+For $9\le n\le 14$ we verified by exhaustive enumeration of all tree shapes ($46$, $98$, $207$, $451$, $983$ and $2179$ shapes, respectively) that $u_n$ is the unique maximizer; the enumeration (a short program computing $\Sh(T)$ via \eqref{eq:recursion} for every shape) reproduces the maxima of \cite[Fig.~5]{DR2019} for all $n\le 19$ and finds a unique maximizer for every $9\le n\le 19$.
+(These base cases are also verified inside the Lean formalization; see Section~\ref{sec:lean}.)
+
+Let $n\ge 15$ and let $T=[L,R]$ with $a=|L|\le b=|R|$ satisfy $\cstar(T)=f(n)$.
+In the chain of inequalities in the proof of Proposition~\ref{prop:upper} all inequalities are then equalities.
+Equality throughout forces $s(L)=F(a)+1$, $s(R)=F(b)+1$, $k=\min(a,b,3)$, and equality in Lemma~\ref{lem:arith}.
+By Lemma~\ref{lem:arith}, $a=3$, so $L=\kappa_3$ (the only shape with three leaves).
+In particular $s(R)=F(n-3)+1$, i.e.\ $R$ is a maximizer for $n-3\ge 12$; by induction $R=u_{n-3}$, hence $T=[\kappa_3,u_{n-3}]=u_n$.
+\end{proof}
+
+For $n\le 8$ the maximizers are not unique in general; the complete lists are
+$n=4$: $[\lf,\kappa_3]$, $[\kappa_2,\kappa_2]$;
+$n=6$: $[\kappa_2,[\lf,\kappa_3]]$, $[\kappa_2,[\kappa_2,\kappa_2]]$;
+$n=8$: $[\kappa_2,[\kappa_2,[\lf,\kappa_3]]]$, $[\kappa_2,[\kappa_2,[\kappa_2,\kappa_2]]]$, $[\kappa_3,[\kappa_2,\kappa_3]]$;
+and $u_n$ is the unique maximizer for $n\in\{2,3,5,7\}$.
+
+\section{The minimum}\label{sec:min}
+
+\begin{proof}[Proof of Proposition~\ref{prop:min}]
+By Lemma~\ref{lem:small}, $\Sh(T)$ contains shapes with $1,2,\dots,n$ leaves, so $s(T)\ge n$ and $\cstar(T)\ge n-1$.
+Call $T$ \emph{minimal} if $s(T)=|T|$, i.e.\ $\Sh(T)$ contains exactly one shape with $j$ leaves for each $j\le|T|$.
+Let $T=[L,R]$ with $a=|L|\le b=|R|$.
+If $a\ge 2$ and $b\ge 3$, then $[\kappa_2,\kappa_2]$ and $[\lf,\kappa_3]$ are two distinct $4$-leaf shapes in $\Sh(T)$, so $T$ is not minimal.
+If $a=b=2$ then $T=[\kappa_2,\kappa_2]$, which is minimal.
+If $a=1$, then $\Sh(L)=\{\lf\}\subseteq\Sh(R)$ and Lemma~\ref{lem:product} gives $s(T)=1+s(R)$, so $T$ is minimal iff $R$ is.
+Hence the minimal shapes are $\lf,\kappa_2,\kappa_3$, the two $4$-leaf shapes $[\lf,\kappa_3]$, $[\kappa_2,\kappa_2]$, and for $n\ge 5$ exactly the two shapes $[\lf,[\lf,\dots,[\lf,y]\dots]]$ with $y\in\{[\lf,\kappa_3],[\kappa_2,\kappa_2]\}$.
+\end{proof}
+
+\section{Formal verification in Lean}\label{sec:lean}
+
+We formalized the statement of Conjecture~\ref{conj:DR} together with the proofs of Theorems~\ref{thm:main} and \ref{thm:unique} and of the lower bound in Proposition~\ref{prop:min} in Lean~4 (version 4.33.1) with Mathlib (commit \texttt{0df444a}).
+Trees are plane binary trees, shapes are classes for the equivalence relation generated by child swaps, and the prunings are defined by the recursion \eqref{eq:recursion}:
+\begin{Verbatim}[fontsize=\small,frame=single]
+inductive BTree where
+  | leaf : BTree
+  | node : BTree → BTree → BTree
+
+inductive Iso : BTree → BTree → Prop
+  | leaf : Iso leaf leaf
+  | node {a b c d} : Iso a c → Iso b d → Iso (node a b) (node c d)
+  | swap {a b c d} : Iso a d → Iso b c → Iso (node a b) (node c d)
+
+def prunings : BTree → Finset BTree
+  | leaf => {leaf}
+  | node l r => insert leaf ((l.prunings ×ˢ r.prunings).image
+                                fun p => node p.1 p.2)
+
+noncomputable def rootConfigs (T : BTree) : ℕ :=
+  Nat.card {s : Quotient shapeSetoid //
+              ∃ P ∈ T.prunings, P ≠ leaf ∧ Quotient.mk _ P = s}
+
+def drMax (n : ℕ) : ℕ :=
+  3 ^ (n / 3) * (2 * (n % 3) ^ 2 + 8 * (n % 3) + 23) / 27
+
+theorem disanto_rosenberg (n : ℕ) (hn : 2 ≤ n) :
+    IsGreatest {k | ∃ T : BTree, T.leaves = n ∧ T.rootConfigs = k}
+      (drMax n)
+\end{Verbatim}
+Here \texttt{shapeSetoid} is the equivalence closure of \texttt{Iso}.
+The same file also proves
+\begin{Verbatim}[fontsize=\small,frame=single]
+theorem disanto_rosenberg_unique (n : ℕ) (hn : 9 ≤ n) (T : BTree)
+    (hleaves : T.leaves = n) (hmax : T.rootConfigs = drMax n) :
+    BTree.Iso T (BTree.extremal n)
+
+theorem disanto_rosenberg_minimum (n : ℕ) (hn : 1 ≤ n) :
+    IsLeast {k | ∃ T : BTree, T.leaves = n ∧ T.rootConfigs = k} (n - 1)
+\end{Verbatim}
+where \texttt{BTree.extremal n} is an explicit tree of shape $u_n$.
+All three theorems are proved without \texttt{sorry} and without \texttt{native\_decide}, and depend only on the standard axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+In fact two independent formalizations were produced from the same fixed statement file (files \texttt{Main.lean} and \texttt{Independent.lean} in \nolinkurl{lean/KOS/Phylogenetics/AncestralConfigurations/} of the repository; about 900 and 1000 lines, each checked in under ten seconds once Mathlib is built); the second one proves the uniqueness statement in the form that any two maximizers with $n\ge 9$ leaves are isomorphic, together with the corresponding $\exists!$ statement for shapes.
+In particular the base cases $9\le n\le 14$ of Theorem~\ref{thm:unique} are covered by kernel-checked finite computations inside Lean, so Theorem~\ref{thm:unique} does not depend on the external enumeration mentioned in Section~\ref{sec:unique}.
+
+The formal proof follows Sections~\ref{sec:prunings}--\ref{sec:unique}, with two technical differences.
+Shapes are represented by a complete numerical invariant: the code of $\lf$ is $0$ and the code of $[x,y]$ is $\pi(\min,\max)+1$, where $\pi$ is the Cantor pairing function applied to the codes of $x$ and $y$; isomorphism of trees is proved equivalent to equality of codes.
+Lemma~\ref{lem:arith} is proved by reducing to $1\le a,b\le 11$, using $F(n+3)=3F(n)$ for $n\ge 9$ and the fact that the correction term $\binom{\min(a,b,3)}{2}$ does not change when $b\ge 3$ is replaced by $b+3$, followed by a finite check by \texttt{decide}.
+The trusted part of the formalization consists of the displayed definitions; their agreement with the definitions of \cite{DR2019} is the content of Lemma~\ref{lem:reduction} and of the recursion~\eqref{eq:recursion}.
+
+\section{Concluding remarks}\label{sec:remarks}
+
+\begin{enumerate}
+\item The product formula~\eqref{eq:product} makes $\cstar$ computable in time polynomial in the number of distinct pruned shapes, and may be useful for other extremal questions about non-equivalent configurations.
+\item Disanto and Rosenberg also consider the \emph{total} number of non-equivalent configurations, summed over all internal nodes of the species tree.
+Its maximum is not attained by $u_n$ for $n\ge 5$: by exhaustive computation the maxima for $n=2,\dots,17$ are
+1, 3, 6, 10, 15, 22, 33, 46, 69, 94, 141, 193, 285, 397, 573, 817,
+whereas $u_n$ attains 1, 3, 6, 9, 14, 21, 30, 45, 57, 93, 117, 159, 237, 327, 459, 663.
+Since the total is at least the root count and at most $(n-1)M_n$ (each of the $n-1$ internal nodes contributes at most $M_n$, as $M_m$ is nondecreasing in $m$), its growth constant is also $3^{1/3}$ by Corollary~\ref{cor:growth}; determining the exact maximum and the extremal shapes is an open problem.
+\end{enumerate}
+
+\subsection*{Author contributions}
+GPT-6-Astra identified the conjecture as an open problem suitable for this project and proposed the product formula~\eqref{eq:product} together with the reduction to Lemma~\ref{lem:arith}; it also produced the first Lean formalization.
+Claude Opus~5.5 completed and checked the proofs (Lemma~\ref{lem:arith}, the uniqueness and minimum results), carried out the computations, wrote the manuscript and produced the second, independent Lean formalization.
+Claude Fable~5.1 refereed the proof against the definitions of \cite{DR2019} and searched the literature for prior work.
+A human operator initiated the project, suggested looking for open problems in applied fields, and provided computing resources; the mathematics, the formal proofs and the text were produced by the models.
+All statements were checked by exhaustive computation for small $n$, and Theorems~\ref{thm:main} and \ref{thm:unique} were verified in Lean by two independent formalizations.
+
+\begin{thebibliography}{99}
+
+\bibitem{DR2017}
+F.~Disanto and N.~A. Rosenberg,
+\emph{Enumeration of ancestral configurations for matching gene trees and species trees},
+J. Comput. Biol. \textbf{24} (2017), 831--850.
+
+\bibitem{DR2019}
+F.~Disanto and N.~A. Rosenberg,
+\emph{On the number of non-equivalent ancestral configurations for matching gene trees and species trees},
+Bull. Math. Biol. \textbf{81} (2019), 384--407. doi:10.1007/s11538-017-0342-x.
+
+\bibitem{DFPR2022}
+F.~Disanto, M.~Fuchs, A.~R. Paningbatan and N.~A. Rosenberg,
+\emph{The distributions under two species-tree models of the number of root ancestral configurations for matching gene trees and species trees},
+Ann. Appl. Probab. \textbf{32} (2022), 4426--4458.
+
+\bibitem{DFHPR2024}
+F.~Disanto, M.~Fuchs, C.-Y. Huang, A.~R. Paningbatan and N.~A. Rosenberg,
+\emph{The distributions under two species-tree models of the total number of ancestral configurations for matching gene trees and species trees},
+Adv. in Appl. Math. \textbf{152} (2024), 102594.
+
+\bibitem{LR2024}
+E.~Lappo and N.~A. Rosenberg,
+\emph{A lattice structure for ancestral configurations arising from the relationship between gene trees and species trees},
+Discrete Appl. Math. \textbf{343} (2024), 65--81.
+
+\bibitem{Wu2012}
+Y.~Wu,
+\emph{Coalescent-based species tree inference from gene tree topologies under incomplete lineage sorting by maximum likelihood},
+Evolution \textbf{66} (2012), 763--775.
+
+\bibitem{Lean4}
+L.~de Moura and S.~Ullrich,
+\emph{The Lean 4 theorem prover and programming language},
+in: Automated Deduction -- CADE 28, Lecture Notes in Comput. Sci. \textbf{12699}, Springer, 2021, 625--635.
+
+\bibitem{Mathlib}
+The mathlib Community,
+\emph{The Lean mathematical library},
+in: Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs (CPP 2020), 367--381.
+
+\end{thebibliography}
+
+\end{document}

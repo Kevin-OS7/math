@@ -1,0 +1,141 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{xcolor}
+\usepackage[no-math]{fontspec}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.82]
+\usepackage[margin=1.15in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyvrb}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{The reversed-prime iteration of OEIS A100475 never enters a cycle}
+\author{Claude Opus 5.5}
+\thanks{The author is an AI model (Claude Opus~5.5, Anthropic). Source files and Lean code: \url{https://github.com/Kevin-OS7/math}.}
+\date{October 29, 2026}
+
+\begin{document}
+
+\begin{abstract}
+Let $p_k$ be the $k$-th prime and $\operatorname{rev}(m)$ the integer whose decimal digits are those of $m$ in reverse order.
+The OEIS sequence A100475 iterates $k\mapsto\operatorname{rev}(p_k)$ from $1$, and its entry asks whether the iteration, started anywhere other than $1$, ever goes into a loop.
+We show that it never does: for every starting value $x\ge 1$ the orbit is not eventually periodic.
+The proof combines the monotonicity of the number of digits along an orbit with the bound $\pi(10^d)<10^{d-1}$ for $d\ge 5$ and a finite check.
+The result has been formally verified in Lean~4 against the statement in the \emph{Formal Conjectures} repository, where it was listed as an open problem.
+In contrast, in base $6$ and in base $8$ the analogous map has a fixed point.
+\end{abstract}
+
+\maketitle
+
+\section{The question}
+
+Let $p_1=2,p_2=3,\dots$ be the primes and, for $m\ge 1$, let $\operatorname{rev}(m)$ denote the reversal of the decimal digits of $m$.
+Put $F(k)=\operatorname{rev}(p_k)$ for $k\ge 1$.
+The sequence A100475 of the OEIS \cite{OEIS}, ``prime-th recurrence with reversal at each step'' (J.~Vos Post, 2004), is $a(0)=1$, $a(n+1)=F(a(n))$:
+\[
+1,\ 2,\ 3,\ 5,\ 11,\ 13,\ 14,\ 34,\ 931,\ 7037,\ 95017,\ 3549221,\ \dots
+\]
+Its entry contains the question: \emph{``Starting at other than $a(n)=1$, does this sequence ever go into a loop?''}
+The question is formalized as the open statement \texttt{OeisA100475.conjecture} in Google DeepMind's \emph{Formal Conjectures} repository \cite{FC}:
+\begin{Verbatim}[fontsize=\small,frame=single]
+theorem conjecture :
+    ∃ x : ℕ, 0 < x ∧ x ≠ 1 ∧ IsUltimatelyPeriodic (aStartAt x)
+\end{Verbatim}
+where \texttt{aStartAt x} is the orbit of $x$ under $F$ and \texttt{IsUltimatelyPeriodic f} means $\exists N,P>0\ \forall n\ge N,\ f(n+P)=f(n)$.
+
+\begin{theorem}\label{thm:main}
+For every $x\ge 1$ the sequence $x,F(x),F(F(x)),\dots$ is not eventually periodic.
+In particular the answer to the question in A100475 is negative, and \texttt{OeisA100475.conjecture} is false.
+\end{theorem}
+
+\section{Proof}
+
+Write $L(m)$ for the number of decimal digits of $m\ge1$, and $\pi(x)$ for the number of primes $\le x$.
+
+\begin{lemma}\label{lem:digits}
+For $k\ge 1$ we have $F(k)\ge 1$ and $L(F(k))=L(p_k)\ge L(k)$.
+\end{lemma}
+
+\begin{proof}
+No prime is divisible by $10$, so the last digit of $p_k$ is nonzero and $\operatorname{rev}(p_k)$ has exactly $L(p_k)$ digits.
+Since $p_k>k$, $L(p_k)\ge L(k)$.
+\end{proof}
+
+Thus $L$ is nondecreasing along every orbit.
+Suppose an orbit is eventually periodic.
+Then on its periodic part $L$ is constant, say equal to $d$, and every element $k$ of the periodic part satisfies $10^{d-1}\le k$ and $p_k<10^d$, i.e.\ $k\le\pi(10^d)$.
+Hence
+\begin{equation}\label{eq:need}
+10^{d-1}\le\pi(10^d).
+\end{equation}
+
+\begin{lemma}\label{lem:pi}
+$\pi(10^d)<10^{d-1}$ for every $d\ge 5$.
+\end{lemma}
+
+\begin{proof}
+For $d=5,6,7$ we use Legendre's sieve: if $Q$ is the set of the first $60$ primes (all $\le 281$) and $\varphi(x)$ is the number of $m\le x$ divisible by no element of $Q$, then $\pi(x)\le 60+\varphi(x)$, and the recursion $\varphi(x;q\cup Q')=\varphi(x;Q')-\varphi(\lfloor x/q\rfloor;Q')$ gives
+$\varphi(10^5-1)=9560$, $\varphi(10^6-1)=95648$, $\varphi(10^7-1)=985311$; hence $\pi(10^5)\le 9620$, $\pi(10^6)\le 95708$, $\pi(10^7)\le 985371$.
+(The true values are $9592$, $78498$ and $664579$.)
+For $d\ge 8$ we argue by induction using only Chebyshev's elementary bound $\prod_{p\le x}p\le 4^x$.
+Let $K\ge 10^6$ with $\pi(10K)<K$ and let $m$ be the number of primes in $[10K,100K)$.
+Then
+\[
+(10K)^m\le\prod_{10K\le p<100K}p\le 4^{100K}<10^{63K}=(10^7)^{9K}\le(10K)^{9K},
+\]
+so $m<9K$ and $\pi(100K)<K+9K=10K$.
+Starting from $K=10^6$ this gives the claim for all $d\ge 8$.
+\end{proof}
+
+By \eqref{eq:need} and Lemma~\ref{lem:pi}, the periodic part of an eventually periodic orbit lies in $[1,\pi(10^4)]=[1,1229]$.
+A direct computation shows that every orbit starting in $[1,1229]$ leaves this interval after at most $9$ steps (for instance $1\mapsto2\mapsto3\mapsto5\mapsto11\mapsto13\mapsto14\mapsto34\mapsto931\mapsto7037$).
+This contradicts the periodicity, since the periodic part is invariant under $F$.
+This proves Theorem~\ref{thm:main}. \qed
+
+\section{Formal verification}
+
+{\sloppy
+We proved
+\begin{Verbatim}[fontsize=\small,frame=single]
+theorem OeisA100475.not_conjecture :
+    ¬ ∃ x : ℕ, 0 < x ∧ x ≠ 1 ∧ IsUltimatelyPeriodic (aStartAt x)
+\end{Verbatim}
+in Lean~4 (v4.33.1) with Mathlib, importing the unmodified statement file \nolinkurl{FormalConjectures/OEIS/100475.lean} of \cite{FC} (commit of 2026-10-28); the released version copies the four definitions of that file verbatim, so that it depends only on Mathlib.
+The proof contains no \texttt{sorry} and no \texttt{native\_decide}; it depends only on the standard axioms (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}) and is checked in about 14 seconds.
+All finite computations are performed by the Lean kernel: the table of the $1229$ primes below $10^4$ (stored as one large integer and certified by trial division, which also yields $\pi(10^4)=1229$ and the needed values of \texttt{Nat.nth}), the three Legendre sieve values above (with the recursion proved correct), and the escape check for all $k\le 1229$.
+The induction step for $d\ge 8$ uses the Mathlib lemma \texttt{primorial\_le\_four\_pow}.
+The proof does not use the hypothesis $x\neq1$, so the sequence A100475 itself is not eventually periodic either.\par}
+
+\section{Other bases}
+
+Let $b\ge 2$ and define $F_b(k)=\operatorname{rev}_b(p_k)$ with base-$b$ digit reversal.
+Lemma~\ref{lem:digits} holds verbatim unless $b\mid p_k$, i.e.\ unless $b$ is prime and $p_k=b$; in that case $\operatorname{rev}_b(p_k)=1$.
+Arguing as above, with the Rosser--Schoenfeld bound $\pi(x)<1.25506\,x/\log x$ \cite{RS} for the large digit lengths and an exhaustive computation for the small ones, one finds that for $2\le b\le 15$ the map $F_b$ has cycles exactly in the bases $b\in\{2,3,5,6,8,11\}$:
+\begin{center}
+\begin{tabular}{ll}
+$b=2$: & the fixed point $1$ \quad ($p_1=2=10_2\mapsto 1$)\\
+$b=3$: & $1\to2\to1$\\
+$b=5$: & $1\to2\to3\to1$\\
+$b=11$: & $1\to2\to3\to5\to1$\\
+$b=6$: & the fixed point $11$ \quad ($p_{11}=31=51_6\mapsto 15_6=11$)\\
+$b=8$: & the fixed point $13$ \quad ($p_{13}=41=51_8\mapsto 15_8=13$)
+\end{tabular}
+\end{center}
+The cycles in the prime bases $2,3,5,11$ pass through the index $k$ with $p_k=b$, where a trailing zero is lost; the fixed points in bases $6$ and $8$ are genuine.
+So the negative answer in base ten is a numerical accident of the base rather than a structural fact.
+
+\subsection*{Provenance}
+The argument, the computations, the Lean formalization and the text were produced by Claude Opus~5.5 (several instances working as agents).
+A human operator initiated the project and provided computing resources.
+
+\begin{thebibliography}{9}
+\bibitem{OEIS} OEIS Foundation Inc., \emph{The On-Line Encyclopedia of Integer Sequences}, sequence A100475, \url{https://oeis.org/A100475}.
+\bibitem{FC} Google DeepMind et al., \emph{Formal Conjectures}, \url{https://github.com/google-deepmind/formal-conjectures}, file \nolinkurl{FormalConjectures/OEIS/100475.lean}.
+\bibitem{RS} J.~B. Rosser and L.~Schoenfeld, \emph{Approximate formulas for some functions of prime numbers}, Illinois J. Math. \textbf{6} (1962), 64--94.
+\end{thebibliography}
+
+\end{document}

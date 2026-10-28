@@ -1,0 +1,14 @@
+{
+  "challenge_module": "ComparatorChallenges.AncestralConfigurations",
+  "solution_module": "KOS.Phylogenetics.AncestralConfigurations.Main",
+  "theorem_names": [
+    "KOS.AncestralConfigurations.disanto_rosenberg"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# Catalog of papers with a formalized main result. Paths are relative to lean/.
+version: "v0.4"
+
+project:
+  name: "Kevin-OS7 math repository"
+  description: "Lean formalizations accompanying a mathematics manuscript collection produced by AI models."
+  authors: ["Claude Opus 5.5", "GPT-6-Astra", "Claude Fable 5.1"]
+  license: "Apache-2.0"
+
+sources:
+  - title: "The maximum number of non-equivalent ancestral configurations: a proof of a conjecture of Disanto and Rosenberg"
+    authors: ["Claude Opus 5.5", "GPT-6-Astra", "Claude Fable 5.1"]
+    id: ../preprints/The-maximum-number-of-non-equivalent-ancestral-configurations-October-29-2026/paper.pdf
+    type: article
+
+  - title: "The reversed-prime iteration of OEIS A100475 never enters a cycle"
+    authors: ["Claude Opus 5.5"]
+    id: ../preprints/The-reversed-prime-iteration-of-OEIS-A100475-never-enters-a-cycle-October-29-2026/paper.pdf
+    type: article
+
+related_formalizations:
+  - id: https://github.com/leanprover-community/mathlib4
+    relationship: builds-on
+
+  - id: https://github.com/google-deepmind/formal-conjectures
+    relationship: builds-on
+
+status:
+  scope: "All main results formalized."
+  # Entries use source-qualified declaration names and the files containing them.
+  main_results:
+    - comparator_config: ComparatorChallenges/AncestralConfigurations.json
+      declaration: KOS.AncestralConfigurations.disanto_rosenberg
+      file: KOS/Phylogenetics/AncestralConfigurations/Main.lean
+
+    - declaration: KOS.AncestralConfigurations.disanto_rosenberg_unique
+      file: KOS/Phylogenetics/AncestralConfigurations/Main.lean
+
+    - declaration: KOS.AncestralConfigurations.disanto_rosenberg_minimum
+      file: KOS/Phylogenetics/AncestralConfigurations/Main.lean
+
+    - declaration: KOS.AncestralConfigurationsIndependent.disanto_rosenberg
+      file: KOS/Phylogenetics/AncestralConfigurations/Independent.lean
+
+    - comparator_config: ComparatorChallenges/OEISA100475.json
+      declaration: OeisA100475.not_conjecture
+      file: KOS/NumberTheory/OEIS/A100475.lean
+
+automation:
+  methods:
+    - method: agent
+
+review:
+  status: unchecked
+
+acknowledgements: >-
+  Thank you very much to the authors of Lean 4, Mathlib, google-deepmind/formal-conjectures,
+  Lake, Comparator, lean4export and landrun,
+  and to Disanto and Rosenberg and to the OEIS contributors for posing the questions.
