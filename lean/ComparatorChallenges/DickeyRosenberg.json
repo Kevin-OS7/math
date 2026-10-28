@@ -1,0 +1,15 @@
+{
+  "challenge_module": "ComparatorChallenges.DickeyRosenberg",
+  "solution_module": "KOS.Phylogenetics.LabeledHistories.Main",
+  "theorem_names": [
+    "DickeyRosenberg.conjecture14i",
+    "DickeyRosenberg.conjecture14ii"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

@@ -1,0 +1,397 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[no-math]{fontspec}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.82]
+\usepackage[margin=1.1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyvrb}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\pre}{\preceq}
+\newcommand{\lf}{\bullet}
+\newcommand{\T}{\mathbb{T}}
+
+\title[Tie-permitting labeled histories]{Maximally probable labeled topologies with simultaneity:\\ a proof of a conjecture of Dickey and Rosenberg}
+
+\author{GPT-6-Astra}
+\author{Claude Fable 5.1}
+\author{Claude Opus 5.5}
+\thanks{The authors are AI models: GPT-6-Astra (OpenAI) and Claude Fable~5.1 and Claude Opus~5.5 (Anthropic). Source files and Lean code: \url{https://github.com/Kevin-OS7/math}.}
+
+\date{October 29, 2026}
+
+\begin{document}
+
+\begin{abstract}
+A labeled history of a rooted binary tree is an ordering of its internal vertices compatible with ancestry; when several vertices may share an event time one obtains tie-permitting labeled histories.
+For a binary tree shape $T$ with $n$ leaves let $E(T,z)$ be the number of tie-permitting labeled histories with exactly $z$ events, and $N(T)=\sum_z E(T,z)$.
+Dickey and Rosenberg (Discrete Appl.\ Math.\ 2026) conjectured that the tree $U^*_n$ of Harding, Hammersley and Grimmett, which uniquely maximizes the number of ordinary labeled histories, also uniquely maximizes $N(T)$ and maximizes $E(T,z)$ for every admissible $z$.
+We prove this conjecture, in the following stronger form: for every bound $m$, the multivariate generating polynomial of strictly order-preserving labelings of the internal vertices of $T$ by $\{1,\dots,m\}$ is coefficientwise dominated by that of $U^*_n$.
+In particular $U^*_n$ maximizes the number of histories with any prescribed ordered sequence of event sizes.
+The proof combines a switching injection for pairs of labelings of a union and an intersection of trees, with different label bounds on the two sides, and an induction that follows the dyadic structure of $U^*_n$.
+Both parts of the conjecture, including uniqueness, have been formally verified in Lean~4 with Mathlib.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+A \emph{labeled history} of a rooted binary tree is a linear ordering of its internal vertices in which every vertex comes after all of its descendants; it records the temporal order of the branching events.
+Under the Yule--Harding model of evolutionary trees, all labeled histories with $n$ labeled leaves are equally likely, so the probability of a labeled topology is proportional to its number of labeled histories.
+The unlabeled shape whose labeled topologies have the most labeled histories was determined by Harding \cite{Harding} and by Hammersley and Grimmett \cite{HG}: $U^*_1=\lf$, $U^*_2=[\lf,\lf]$, and for $n\ge 3$,
+\begin{equation}\label{eq:ustar}
+U^*_n=U^*_t\oplus U^*_{n-t},\qquad t=2^{\lfloor\log_2((n-1)/3)\rfloor+1},
+\end{equation}
+where $A\oplus B$ denotes the tree whose root has subtrees $A$ and $B$; the maximizer is unique.
+
+Dickey and Rosenberg \cite{DR2025,DR2026,DR2026b} studied the analogous questions when several branching events may occur simultaneously.
+For a tree $T$ with $n$ leaves, a \emph{tie-permitting labeled history with $z$ events} is a surjective map $f$ from the internal vertices of $T$ onto $\{1,\dots,z\}$ such that $f(u)<f(v)$ whenever $u$ is a proper descendant of $v$.
+Let $E(T,z)$ be the number of such maps and $N(T)=\sum_{z}E(T,z)$.
+Both numbers depend only on the shape of $T$.
+Dickey and Rosenberg reduced the question of the maximally probable labeled topology with multifurcation and simultaneity to the bifurcating case and stated the following conjecture \cite[Conjecture~14]{DR2026}; see also \cite[Conjecture~20]{DR2026b}.
+
+\begin{conjecture}[Dickey--Rosenberg]\label{conj:DR}
+Let $n\ge 2$.
+\begin{enumerate}
+\item[(i)] $U^*_n$ is the unique binary tree shape with $n$ leaves maximizing $N(T)$.
+\item[(ii)] For every $z$ with $\lceil\log_2 n\rceil\le z\le n-1$, the shape $U^*_n$ maximizes $E(T,z)$ among binary tree shapes with $n$ leaves.
+\end{enumerate}
+\end{conjecture}
+
+They verified the conjecture for $n\le 21$ by exhaustive computation.
+Part (ii) for $z=n-1$ is the theorem of Harding, Hammersley and Grimmett, since every surjection onto $n-1$ events is a labeled history.
+For smaller $z$ the maximizer of $E(\cdot,z)$ need not be unique.
+
+\subsection*{Results}
+For a tree $T$ and an integer $m\ge 0$ define the polynomial
+\begin{equation}\label{eq:K}
+K_T(m)=\sum_{f}\ \prod_{v\in I(T)}x_{f(v)}\ \in\mathbb{Z}[x_1,x_2,\dots],
+\end{equation}
+where $I(T)$ is the set of internal vertices and the sum runs over all maps $f\colon I(T)\to\{1,\dots,m\}$ with $f(u)<f(v)$ whenever $u$ is a child of $v$ (equivalently, a proper descendant).
+These maps need not be surjective.
+Write $F\pre G$ if every coefficient of $G-F$ is nonnegative.
+
+\begin{theorem}\label{thm:main}
+For every binary tree $T$ with $n\ge1$ leaves and every $m\ge 0$,
+\[
+K_T(m)\ \pre\ K_{U^*_n}(m).
+\]
+\end{theorem}
+
+The coefficient of $x_1^{c_1}\cdots x_z^{c_z}$ in $K_T(z)$, for positive $c_1,\dots,c_z$ with $c_1+\dots+c_z=n-1$, counts the tie-permitting labeled histories in which the $i$-th event (in time order) consists of exactly $c_i$ branchings.
+Summing over such coefficients gives $E(T,z)$.
+
+\begin{corollary}\label{cor:main}
+Let $T$ be a binary tree with $n$ leaves.
+\begin{enumerate}
+\item For every ordered sequence of event sizes, $U^*_n$ has at least as many tie-permitting labeled histories with these event sizes as $T$.
+\item $E(T,z)\le E(U^*_n,z)$ for every $z\ge 0$.
+\item $N(T)\le N(U^*_n)$, with equality only if $T$ and $U^*_n$ have the same shape.
+\end{enumerate}
+In particular, Conjecture~\ref{conj:DR} holds.
+\end{corollary}
+
+The proof has two ingredients.
+The first is a switching injection (Lemma~\ref{lem:switch}) comparing labelings of two trees $P,Q$ with labelings of $P\cup Q$ and $P\cap Q$, when the trees are embedded in a common ambient tree; it allows \emph{different} label bounds for the two factors, which is what makes the induction work.
+The second is an induction on the number of leaves that follows the dyadic structure of $U^*_n$ (Sections~\ref{sec:dyadic} and~\ref{sec:split}).
+In the language of $P$-partitions, Lemma~\ref{lem:switch} is related to the multivariate correlation inequalities of Chan and Pak \cite{ChanPak} and to the cell transfer of Lam and Pylyavskyy \cite{LP}; we give a self-contained proof.
+
+\subsection*{Formal verification}
+Both parts of Conjecture~\ref{conj:DR}, including the uniqueness in (i), have been formalized and machine-checked in Lean~4 with Mathlib; see Section~\ref{sec:lean}.
+The formal proof establishes uniqueness directly, by strict versions of the switching inequality, without appealing to the theorem of Harding, Hammersley and Grimmett.
+
+\section{Trees in the infinite binary tree}\label{sec:trees}
+
+Let $\T$ be the infinite rooted binary tree, with vertices numbered in heap order: the root is $1$ and the children of $v$ are $2v$ and $2v+1$.
+A finite binary tree $T$ (every internal vertex has two children) is determined, up to the order of children, by the set $I(T)\subset\T$ of its internal vertices placed in $\T$; this set is finite and closed under taking parents, and conversely every finite parent-closed subset $S\subset\T$ is the set of internal vertices of the binary tree obtained by attaching leaves at the positions of $\T$ below $S$ that are not in $S$.
+The empty set corresponds to the one-leaf tree $\lf$, and a tree with $s$ internal vertices has $s+1$ leaves.
+The quantities in \eqref{eq:K} depend only on the shape.
+
+Partitioning the maps in \eqref{eq:K} according to the label $j+1$ of the root gives $K_\lf(m)=1$ and
+\begin{equation}\label{eq:rec}
+K_{A\oplus B}(m)=\sum_{j=0}^{m-1}x_{j+1}\,K_A(j)\,K_B(j).
+\end{equation}
+Multiplication by polynomials with nonnegative coefficients and finite sums preserve $\pre$.
+
+\subsection*{The canonical trees}
+Let $U_n$ be the tree whose internal vertices are $\{1,2,\dots,n-1\}\subset\T$, the first $n-1$ vertices in breadth-first order.
+These sets are nested: $I(U_a)\subseteq I(U_b)$ for $a\le b$.
+
+\begin{lemma}\label{lem:canonical}
+Let $p$ be a power of two and $2p\le n\le 4p$.
+Then, up to the order of children,
+\[
+U_n=\begin{cases}U_p\oplus U_{n-p}, & 2p\le n\le 3p,\\ U_{2p}\oplus U_{n-2p}, & 3p\le n\le 4p.\end{cases}
+\]
+Consequently $U_n$ has the shape $U^*_n$ of \eqref{eq:ustar} for every $n\ge1$.
+\end{lemma}
+
+\begin{proof}
+The first $2p-1$ vertices of $\T$ form the complete tree with $p$ leaves at depth $\log_2 p$; its two root subtrees have $p-1$ internal vertices each.
+The next $p$ vertices in breadth-first order are the left halves of the next level, i.e.\ they all lie in the left root subtree; the following $p$ lie in the right root subtree.
+Hence for $2p\le n\le 3p$ the two root subtrees of $U_n$ have $n-p-1$ and $p-1$ internal vertices, and for $3p\le n\le 4p$ they have $2p-1$ and $n-2p-1$.
+Each root subtree is itself a breadth-first prefix of its copy of $\T$.
+This proves the displayed formula.
+For $n\ge 3$ the value of $t$ in \eqref{eq:ustar} equals $p$ when $2p\le n\le 3p$ and $2p$ when $3p<n\le 4p$ (the condition on a power of two $t$ is $3t/2\le n-1<3t$), so the root splits of $U_n$ and $U^*_n$ agree, and the claim follows by induction on $n$.
+\end{proof}
+
+We write $G_n(m)=K_{U_n}(m)$.
+
+\section{A switching lemma with different label bounds}\label{sec:switch}
+
+\begin{lemma}[Union and intersection]\label{lem:switch}
+Let $P,Q\subset\T$ be finite parent-closed sets, regarded as sets of internal vertices.
+For $0\le j\le m$,
+\[
+K_P(m)\,K_Q(j)\ \pre\ K_{P\cup Q}(m)\,K_{P\cap Q}(j).
+\]
+\end{lemma}
+
+\begin{proof}
+Fix a finite parent-closed set $R\supseteq P\cup Q$.
+Extend a strict labeling $f$ of $P$ by $\{1,\dots,m\}$ and a strict labeling $g$ of $Q$ by $\{1,\dots,j\}$ to $R$ by zero.
+Then $f\le m$, $g\le j$, the supports of $f$ and $g$ are $P$ and $Q$, and both satisfy
+\begin{equation}\label{eq:strict}
+h(v)>0\ \Longrightarrow\ h(v)<h(u)\qquad\text{whenever $u$ is the parent of $v$}.
+\end{equation}
+Conversely, every pair of functions on $R$ with these properties arises in this way.
+The monomial of the pair is $\prod_{v}x_{f(v)}\prod_v x_{g(v)}$, the products running over the supports.
+
+Put $l=\min(f,g)$ and $h=\max(f,g)$ pointwise.
+Both satisfy \eqref{eq:strict}: for $h$, use the map realizing the maximum at the child; for $l$, if its value at the child is positive, use the map realizing the minimum at the parent.
+Consider the graph $\Gamma$ on the vertices $v$ with $l(v)<h(v)$, in which a child $v$ and its parent $u$ are joined whenever
+\begin{equation}\label{eq:edge}
+h(v)>0\quad\text{and}\quad l(u)\le h(v).
+\end{equation}
+If \eqref{eq:edge} holds then both endpoints are vertices of $\Gamma$: equality $l(u)=h(u)$ would contradict \eqref{eq:strict} for $h$, and $l(v)=h(v)$ would contradict \eqref{eq:strict} for $l$.
+At each vertex of $\Gamma$ record which of $f,g$ is larger.
+This choice is constant along edges, hence on connected components: opposite choices at the endpoints of an edge would put the smaller value at the parent and the larger, positive value at the child into the same map, contradicting \eqref{eq:strict}.
+
+Now interchange $f$ and $g$ on every component of $\Gamma$ that contains a vertex of $Q\setminus P$, and call the resulting functions $F$ and $H$.
+Such a component has $f<g$ throughout, because $f=0<g$ at a vertex of $Q\setminus P$, and it contains no vertex of $P\setminus Q$, where $f>0=g$.
+Hence the supports of $F$ and $H$ are exactly $P\cup Q$ and $P\cap Q$.
+On a switched component $F$ takes values of $g$, which are at most $j\le m$, and $H$ takes the smaller values of $f$, which are at most $j$; elsewhere the original bounds hold.
+So $F\le m$ and $H\le j$.
+
+Both $F$ and $H$ satisfy \eqref{eq:strict}.
+Indeed, any assignment that, on each component of $\Gamma$, gives the high values to one of the two functions and the low values to the other, satisfies \eqref{eq:strict}: on an edge satisfying \eqref{eq:edge} it pairs lows with lows and highs with highs, and on a parent--child pair not satisfying \eqref{eq:edge} either the child is $0$ in both functions or its high value is below the low value of the parent; vertices with $l=h$ play no role.
+
+The map $(f,g)\mapsto(F,H)$ preserves the multiset of the two values at each vertex, hence the monomial, and also $l$, $h$, $\Gamma$ and the set of switched components; applying the same interchange again recovers $(f,g)$.
+It is therefore an injection preserving monomials, which proves the coefficientwise inequality.
+\end{proof}
+
+\begin{corollary}[Nested canonical trees]\label{cor:nested}
+If $a\le d$ and $j\le m$, then $G_a(m)\,G_d(j)\pre G_d(m)\,G_a(j)$.
+\end{corollary}
+
+\begin{proof}
+Apply Lemma~\ref{lem:switch} to $P=I(U_a)$ and $Q=I(U_d)$; then $P\cup Q=I(U_d)$ and $P\cap Q=I(U_a)$.
+\end{proof}
+
+\section{Dyadic comparisons}\label{sec:dyadic}
+
+Fix $n\ge 2$ and assume the induction hypothesis
+\begin{equation}\label{eq:IH}
+K_T(m)\pre G_{|T|}(m)\qquad\text{for all trees $T$ with $|T|<n$ and all $m\ge0$.}
+\end{equation}
+
+\begin{lemma}[Dyadic block]\label{lem:block}
+Let $q$ be a power of two, $q\le a,d\le 2q$ and $a+d\le n$.
+For $j\le m$ put $L=\min(2q,a+d-q)$ and $S=\max(q,a+d-2q)$.
+Then $G_a(m)\,G_d(j)\pre G_L(m)\,G_S(j)$.
+\end{lemma}
+
+\begin{proof}
+Write $a=q+x$ and $d=q+y$ with $0\le x,y\le q$.
+Embed both trees in the complete tree with $2q$ leaves: both contain its complete core of $q-1$ internal vertices; at the next level give the first tree the leftmost $x$ positions and the second tree the rightmost $y$ positions.
+The second embedding is the mirror image of the breadth-first one, so it has the same polynomial $G_d$.
+The union has $q-1+\min(q,x+y)$ internal vertices and the intersection has $q-1+\max(0,x+y-q)$, so their leaf numbers are $L$ and $S$.
+Both are at least $1$ and they sum to $a+d\le n$, so both are smaller than $n$.
+Apply Lemma~\ref{lem:switch} and then \eqref{eq:IH} to the union and to the intersection (which need not be canonical).
+\end{proof}
+
+\begin{lemma}[Rotation]\label{lem:rotation}
+Assume \eqref{eq:IH}.
+Let $b=c+d$ with $c,d\ge 1$ and $U_b=U_c\oplus U_d$, let $a\le d$ and $a+b\le n$.
+Then $G_a(m)\,G_b(m)\pre G_d(m)\,G_{a+c}(m)$.
+\end{lemma}
+
+\begin{proof}
+By \eqref{eq:rec}, Corollary~\ref{cor:nested} and \eqref{eq:IH},
+\begin{align*}
+G_a(m)G_b(m)&=\sum_{j<m}x_{j+1}G_c(j)\,G_a(m)G_d(j)
+\pre G_d(m)\sum_{j<m}x_{j+1}G_c(j)G_a(j)\\
+&=G_d(m)\,K_{U_a\oplus U_c}(m)\pre G_d(m)\,G_{a+c}(m),
+\end{align*}
+where \eqref{eq:IH} applies because $a+c<a+b\le n$.
+\end{proof}
+
+\section{The split lemma}\label{sec:split}
+
+\begin{lemma}\label{lem:split}
+Assume \eqref{eq:IH}.
+Let $a,b\ge1$ with $a+b=n$, and let $U_n=U_t\oplus U_{n-t}$ be the canonical split.
+Then $G_a(m)\,G_b(m)\pre G_t(m)\,G_{n-t}(m)$ for all $m\ge0$.
+\end{lemma}
+
+\begin{proof}
+We may assume $a\le b$.
+Let $p$ be the power of two with $2p\le n<4p$.
+By Lemma~\ref{lem:canonical} the canonical pair is $(p,n-p)$ if $n\le 3p$ and $(2p,n-2p)$ if $n\ge 3p$.
+The following cases are exhaustive.
+
+\emph{Case A: $p\le a\le b\le 2p$.}
+Lemma~\ref{lem:block} with $q=p$ and $j=m$ gives exactly the canonical pair.
+
+\emph{Case B: $a<p$ and $b>2p$.}
+If $b\le 3p$, then $U_b=U_p\oplus U_{b-p}$; Lemma~\ref{lem:rotation} with $d=b-p\ge a$ and $c=p$ gives the pair $(b-p,a+p)$, both of whose entries lie in $[p,2p]$, and Case~A finishes.
+If $b>3p$, then $U_b=U_{2p}\oplus U_{b-2p}$; Lemma~\ref{lem:rotation} with $d=2p>a$ and $c=b-2p$ gives the pair $(2p,n-2p)$, which is canonical.
+
+\emph{Case C: $a<p$ and $b\le 2p$.}
+Then $n<3p$, so the canonical pair is $(p,n-p)$; moreover $b>p$ since $a+b\ge 2p$, and $p\ge2$, so $p=2q$ with $q$ a power of two.
+If $b\ge 3q$, then $U_b=U_p\oplus U_{b-p}$, and Lemma~\ref{lem:rotation} with $d=p>a$ and $c=b-p$ gives $(p,n-p)$ directly.
+If $b<3q$, write $d=b-q$, so that $U_b=U_q\oplus U_d$ with $q\le a,d\le 2q$ and $a+d=n-q\ge 3q$.
+In Lemma~\ref{lem:block} the endpoints are $L=2q=p$ and $S=c:=n-3q$, with $c\ge q$ and $q+c=n-p<n$.
+For every $j<m$ we get $G_a(m)G_d(j)\pre G_p(m)G_c(j)$; multiplying by $x_{j+1}G_q(j)$, summing over $j$ and using \eqref{eq:rec} and \eqref{eq:IH},
+\[
+G_a(m)G_b(m)\pre G_p(m)\,K_{U_q\oplus U_c}(m)\pre G_p(m)\,G_{n-p}(m).
+\]
+
+\emph{Case D: $a\ge p$ and $b>2p$.}
+Since $n<4p$ we have $b<3p$; write $d=b-p$, so $U_b=U_p\oplus U_d$ with $a,d\in[p,2p]$ and $a+d=n-p<3p$.
+Lemma~\ref{lem:block}, now at its lower endpoint, gives $G_a(m)G_d(j)\pre G_{n-2p}(m)G_p(j)$ for $j<m$.
+Multiplying by $x_{j+1}G_p(j)$, summing, and using \eqref{eq:rec} together with $U_{2p}=U_p\oplus U_p$,
+\[
+G_a(m)G_b(m)\pre G_{n-2p}(m)\,G_{2p}(m).
+\]
+Here $n>3p$, so this is the canonical pair.
+\end{proof}
+
+\section{Proof of the main results}\label{sec:proofs}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+By Lemma~\ref{lem:canonical} it suffices to prove $K_T(m)\pre G_n(m)$, by strong induction on $n$.
+For $n=1$ there is equality.
+For $n\ge2$ write $T=A\oplus B$ with $a=|A|$, $b=|B|$; both are positive and smaller than $n$.
+By \eqref{eq:rec}, \eqref{eq:IH} and Lemma~\ref{lem:split} at each $j$,
+\[
+K_T(m)\pre\sum_{j<m}x_{j+1}G_a(j)G_b(j)\pre\sum_{j<m}x_{j+1}G_t(j)G_{n-t}(j)=G_n(m).
+\]
+All uses of \eqref{eq:IH} inside Lemmas~\ref{lem:block}--\ref{lem:split} concern trees with fewer than $n$ leaves, so the induction is well founded.
+\end{proof}
+
+\begin{proof}[Proof of Corollary~\ref{cor:main}]
+Parts (1) and (2) follow by taking the coefficients described after Theorem~\ref{thm:main}, and $N(T)\le N(U^*_n)$ by summing (2) over $z$.
+For the equality case, $E(T,n-1)$ is the number of ordinary labeled histories of $T$, because a surjection of the $n-1$ internal vertices onto $n-1$ events is a bijection.
+By the theorem of Harding, Hammersley and Grimmett \cite{Harding,HG} (see also \cite[Theorem~7]{DR2026} and the independent proof in \cite{DR2026b}), $E(T,n-1)<E(U^*_n,n-1)$ unless $T$ has the shape $U^*_n$.
+Together with (2) this gives $N(T)<N(U^*_n)$ for every other shape.
+\end{proof}
+
+\begin{remark}
+The formal proof (Section~\ref{sec:lean}) obtains the uniqueness in (3) without the Harding--Hammersley--Grimmett theorem.
+It constructs, for every non-canonical root split, pairs of labelings outside the image of the switching injection of Lemma~\ref{lem:switch} (all positive labels on the union are placed above those on the intersection, so that the graph $\Gamma$ connects all of the union), which yields a strict deficit for some label bound; equality $N(T)=N(U^*_n)$ is then shown to force equality of all event counts and of all bounded-labeling counts, and a second induction produces an isomorphism.
+\end{remark}
+
+\section{Computations and formal verification}\label{sec:lean}
+
+\subsection*{Computations}
+The conclusions were tested independently of the proof.
+For all binary tree shapes with at most $21$ leaves ($676{,}157$ shapes for $n=21$), $U^*_n$ is the unique maximizer of $N$, it maximizes $E(\cdot,z)$ for every $z$, and the values agree with the tables of \cite{DR2026} (for instance $N(U^*_{21})=98{,}672{,}511{,}931{,}269$).
+The split comparison of Lemma~\ref{lem:split}, with all variables set to $1$, was checked exactly for every split with $n\le 512$, and its multivariate form for $n\le 32$ with up to seven labels.
+The switching map of Lemma~\ref{lem:switch} was audited exhaustively on all pairs of labelings by $\{0,\dots,4\}$ of a seven-vertex ambient tree.
+
+\subsection*{Lean}
+The statement was formalized as follows (Lean~4, version 4.33.1, with Mathlib).
+A binary tree is represented by the finite parent-closed set of its internal vertices in the heap numbering of $\T$, the canonical tree $U_n$ by $\{1,\dots,n-1\}$, a tie-permitting labeled history by a surjection onto \texttt{Fin z} that increases along child-to-parent edges, and isomorphism by a bijection of internal vertices preserving the parent relation in both directions:
+\begin{Verbatim}[fontsize=\small,frame=single]
+structure Shape where
+  nodes : Finset ℕ
+  positive : ∀ v ∈ nodes, 0 < v
+  closed : ∀ v ∈ nodes, 1 < v → v / 2 ∈ nodes
+
+def Shape.leaves (T : Shape) : ℕ := T.nodes.card + 1
+def Parent (u v : ℕ) : Prop := 1 < u ∧ u / 2 = v
+def canonical (n : ℕ) : Shape := ⟨Finset.Ico 1 n, _, _⟩
+
+def Isomorphic (T S : Shape) : Prop :=
+  ∃ e : {v // v ∈ T.nodes} ≃ {v // v ∈ S.nodes},
+    ∀ u v, Parent u.val v.val ↔ Parent (e u).val (e v).val
+
+def IsHistory (T : Shape) (z : ℕ) (f : {v // v ∈ T.nodes} → Fin z) :=
+  Function.Surjective f ∧ ∀ u v, Parent u.val v.val → f u < f v
+
+noncomputable def E (T : Shape) (z : ℕ) : ℕ :=
+  Nat.card {f : {v // v ∈ T.nodes} → Fin z // IsHistory T z f}
+noncomputable def N (T : Shape) : ℕ :=
+  ∑ z ∈ Finset.range (T.nodes.card + 1), E T z
+
+def Conjecture14i : Prop :=
+  ∀ T : Shape, N T ≤ N (canonical T.leaves) ∧
+    (N T = N (canonical T.leaves) → Isomorphic T (canonical T.leaves))
+def Conjecture14ii : Prop :=
+  ∀ (T : Shape) (z : ℕ), Nat.clog 2 T.leaves ≤ z → z ≤ T.leaves - 1 →
+    E T z ≤ E (canonical T.leaves) z
+\end{Verbatim}
+{\sloppy The theorems \texttt{conjecture14i : Conjecture14i} and \texttt{conjecture14ii : Conjecture14ii} are proved without \texttt{sorry} or \texttt{native\_decide} and depend only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+In addition, the recursive tree $U^*_n$ of \eqref{eq:ustar} is defined literally in Lean (\texttt{ustar}, with $t=1$ for $n=3$, as $\lfloor\log_2(2/3)\rfloor=-1$), the formalization proves \texttt{ustar\_iso\_canonical} (Lemma~\ref{lem:canonical}), and both parts are restated and proved with \texttt{ustar} in place of \texttt{canonical} (\texttt{conjecture14i\_paper}, \texttt{conjecture14ii\_paper}).
+The statements \texttt{conjecture14i} and \texttt{conjecture14ii} were also checked with Comparator against a separately fixed statement file, using both the Lean kernel and the independent kernel nanoda.
+The formalization (about 2900 lines, in \nolinkurl{lean/KOS/Phylogenetics/LabeledHistories/Main.lean} of the repository) is checked in under ten seconds once Mathlib is built.\par}
+
+\subsection*{Author contributions}
+Claude Fable~5.1 proposed the conjecture as a target, together with the reduction to a comparison of the polynomials of canonical trees.
+GPT-6-Astra found the proof (Lemma~\ref{lem:switch}, the dyadic induction and the strict version used for uniqueness) and wrote the Lean formalization.
+Claude Fable~5.1 refereed the proof against the definitions of \cite{DR2026} and verified the conclusions numerically.
+Claude Opus~5.5 coordinated the work, checked the formalization and wrote the manuscript.
+A human operator initiated the project and provided computing resources; the mathematics, the formal proofs and the text were produced by the models.
+
+\begin{thebibliography}{99}
+
+\bibitem{ChanPak}
+S.~H. Chan and I.~Pak,
+\emph{Multivariate correlation inequalities for $P$-partitions},
+Pacific J. Math. \textbf{323} (2023), 223--252.
+
+\bibitem{DR2025}
+E.~H. Dickey and N.~A. Rosenberg,
+\emph{Labelled histories with multifurcation and simultaneity},
+Phil. Trans. R. Soc. B \textbf{380} (2025), 20230307.
+
+\bibitem{DR2026}
+E.~H. Dickey and N.~A. Rosenberg,
+\emph{Labeled histories and maximally probable labeled topologies with multifurcation},
+Discrete Appl. Math. \textbf{391} (2026); arXiv:2511.16799.
+
+\bibitem{DR2026b}
+E.~H. Dickey and N.~A. Rosenberg,
+\emph{Maximally probable tree topologies with $r$-furcation},
+arXiv:2602.07426 (2026).
+
+\bibitem{HG}
+J.~M. Hammersley and G.~R. Grimmett,
+\emph{Maximal solutions of the generalized subadditive inequality},
+in: Stochastic Geometry (E.~F. Harding and D.~G. Kendall, eds.), Wiley, London, 1974, 270--284.
+
+\bibitem{Harding}
+E.~F. Harding,
+\emph{The probabilities of rooted tree-shapes generated by random bifurcation},
+Adv. in Appl. Probab. \textbf{3} (1971), 44--77.
+
+\bibitem{LP}
+T.~Lam and P.~Pylyavskyy,
+\emph{Cell transfer and monomial positivity},
+J. Algebraic Combin. \textbf{26} (2007), 209--224.
+
+\end{thebibliography}
+
+\end{document}

@@ -8,8 +8,8 @@
 \date{October 29, 2026}
 \begin{document}
 \begin{abstract}
-This collection contains two manuscripts, each resolving a published open question.
-Both main results are formally verified in Lean~4 with Mathlib.
+This collection contains three manuscripts, each resolving a published open question.
+All main results are formally verified in Lean~4 with Mathlib.
 The manuscripts, Lean code and supporting computations were produced by AI models working as a team of agents; see the repository README for how the results were produced.
 \end{abstract}
 \maketitle
@@ -34,5 +34,15 @@ OEIS A100475 iterates $k\mapsto\operatorname{rev}(p_k)$, where $p_k$ is the $k$-
 The note shows that no start leads to a cycle: the number of digits never decreases along an orbit, $\pi(10^d)<10^{d-1}$ for $d\ge 5$ confines any cycle to $[1,1229]$, and a finite check excludes cycles there.
 In other bases cycles can exist: base $6$ has the fixed point $11$ and base $8$ the fixed point $13$.
 \emph{Formalization:} a Lean proof of the negation of the formal-conjectures statement.
+
+
+\section*{003. Maximally probable labeled topologies with simultaneity}
+\emph{Discipline: mathematical biology (phylogenetics); combinatorics of posets.}
+
+The tree $U^*_n$ of Harding, Hammersley and Grimmett uniquely maximizes the number of labeled histories (orderings of the internal vertices compatible with ancestry) among binary trees with $n$ leaves.
+Dickey and Rosenberg (Discrete Appl.\ Math.\ 2026) allowed several branching events to occur simultaneously and conjectured that $U^*_n$ also uniquely maximizes the total number $N(T)$ of such tie-permitting histories, and maximizes the number $E(T,z)$ with $z$ events for every $z$.
+The manuscript proves the conjecture in a stronger, coefficientwise form: for every bound $m$, the generating polynomial $\sum_f\prod_v x_{f(v)}$ of strict labelings of the internal vertices by $\{1,\dots,m\}$ is maximized coefficientwise by $U^*_n$.
+The key tool is a switching injection comparing labelings of two trees with labelings of their union and intersection, with different label bounds on the two sides, used in an induction along the dyadic structure of $U^*_n$.
+\emph{Formalization:} both parts of the conjecture including uniqueness, with the paper's recursive definition of $U^*_n$.
 
 \end{document}

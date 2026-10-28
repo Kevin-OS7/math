@@ -33,6 +33,14 @@ thm = statement(ch, 'not_conjecture')
 s = read('KOS/NumberTheory/OEIS/A100475.lean')
 results.append(('KOS/NumberTheory/OEIS/A100475.lean', defs in s, thm in s))
 
+# Dickey–Rosenberg Conjecture 14: definitions = from the namespace line up to the first theorem.
+ch = read('ComparatorChallenges/DickeyRosenberg.lean')
+defs = between(ch, 'namespace DickeyRosenberg\n', '/-- Dickey–Rosenberg Conjecture 14 (i)')
+s = read('KOS/Phylogenetics/LabeledHistories/Main.lean')
+results.append(('KOS/Phylogenetics/LabeledHistories/Main.lean', defs.rstrip() in s,
+                re.search(r'theorem conjecture14i\b\s*:\s*Conjecture14i', s) is not None and
+                re.search(r'theorem conjecture14ii\b\s*:\s*Conjecture14ii', s) is not None))
+
 ok = True
 for sol, d, t in results:
     print(f'{sol}: definitions verbatim: {d}; statement verbatim: {t}')

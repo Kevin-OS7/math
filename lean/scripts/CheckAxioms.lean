@@ -12,3 +12,8 @@ Every line should read `[propext, Classical.choice, Quot.sound]`. -/
 #print axioms KOS.AncestralConfigurationsIndependent.disanto_rosenberg_unique_shape
 #print axioms KOS.AncestralConfigurationsIndependent.disanto_rosenberg_min
 #print axioms OeisA100475.not_conjecture
+#print axioms DickeyRosenberg.conjecture14i
+#print axioms DickeyRosenberg.conjecture14ii
+#print axioms DickeyRosenberg.ustar_iso_canonical
+#print axioms DickeyRosenberg.conjecture14i_paper
+#print axioms DickeyRosenberg.conjecture14ii_paper

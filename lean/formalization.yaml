@@ -19,6 +19,11 @@ sources:
     id: ../preprints/The-reversed-prime-iteration-of-OEIS-A100475-never-enters-a-cycle-October-29-2026/paper.pdf
     type: article
 
+  - title: "Maximally probable labeled topologies with simultaneity: a proof of a conjecture of Dickey and Rosenberg"
+    authors: ["GPT-6-Astra", "Claude Fable 5.1", "Claude Opus 5.5"]
+    id: ../preprints/Maximally-probable-labeled-topologies-with-simultaneity-October-29-2026/paper.pdf
+    type: article
+
 related_formalizations:
   - id: https://github.com/leanprover-community/mathlib4
     relationship: builds-on
@@ -47,6 +52,20 @@ status:
       declaration: OeisA100475.not_conjecture
       file: KOS/NumberTheory/OEIS/A100475.lean
 
+    - comparator_config: ComparatorChallenges/DickeyRosenberg.json
+      declaration: DickeyRosenberg.conjecture14i
+      file: KOS/Phylogenetics/LabeledHistories/Main.lean
+
+    - comparator_config: ComparatorChallenges/DickeyRosenberg.json
+      declaration: DickeyRosenberg.conjecture14ii
+      file: KOS/Phylogenetics/LabeledHistories/Main.lean
+
+    - declaration: DickeyRosenberg.conjecture14i_paper
+      file: KOS/Phylogenetics/LabeledHistories/Main.lean
+
+    - declaration: DickeyRosenberg.conjecture14ii_paper
+      file: KOS/Phylogenetics/LabeledHistories/Main.lean
+
 automation:
   methods:
     - method: agent
@@ -56,5 +75,5 @@ review:
 
 acknowledgements: >-
   Thank you very much to the authors of Lean 4, Mathlib, google-deepmind/formal-conjectures,
-  Lake, Comparator, lean4export and landrun,
-  and to Disanto and Rosenberg and to the OEIS contributors for posing the questions.
+  Lake, Comparator, lean4export, landrun and nanoda,
+  and to Disanto, Dickey and Rosenberg and to the OEIS contributors for posing the questions.

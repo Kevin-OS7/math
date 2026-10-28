@@ -2,7 +2,18 @@
 
 For any withdrawn papers, their README files will explain the gap and link to the retracted manuscript. For any updated papers, previously published editions remain accessible through the git history.
 
-## October 29, 2026
+## October 29, 2026 (second release)
+
+**New result**
+
+- *Maximally probable labeled topologies with simultaneity: a proof of a conjecture of Dickey and Rosenberg.* Proves Conjecture 14 of Dickey and Rosenberg (Discrete Appl. Math. 2026) in a stronger, coefficientwise form. Lean formalization of both parts, including uniqueness, and of the identification of the paper's recursively defined tree with the breadth-first tree used in the proof.
+
+**Verification improvements**
+
+- All three Comparator statements were also checked with the independent kernel [nanoda](https://github.com/ammkrn/nanoda_lib) in addition to the Lean kernel.
+- The README now records how earlier work was searched for, including GitHub.
+
+## October 29, 2026 (initial release)
 
 **Initial release**
 
