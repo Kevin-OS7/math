@@ -1,0 +1,14 @@
+{
+  "challenge_module": "ComparatorChallenges.ForcingNumbers",
+  "solution_module": "KOS.GraphTheory.ForcingNumbers.Main",
+  "theorem_names": [
+    "Forcing.problem55"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

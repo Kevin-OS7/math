@@ -1,0 +1,18 @@
+# ./minvar_scan 5 1048576   (full Gray-code enumeration of the Theorem-2 family)
+DONE lo=5 hi=1048576 tie_count=0
+
+# ./minvar_fast 2 262144 check ; ./minvar_fast 262145 1048576 check   (windowed scan vs full enumeration)
+DONE lo=2 hi=262144 ties=0 mismatches=0 repasses=261400
+DONE lo=262145 hi=1048576 ties=0 mismatches=0 repasses=786322
+
+# ./minvar_fast 1048577 67256579
+TIE n=67256579 ties=2 D=330431494786
+DONE lo=1048577 hi=67256579 ties=1 mismatches=0 repasses=66207657
+
+# ./minvar_fast 67256580 268435456
+TIE n=140525827 ties=2 D=696024343290
+TIE n=143671555 ties=2 D=711030447854
+TIE n=151535875 ties=2 D=748738680534
+TIE n=168050947 ties=2 D=828323039922
+TIE n=201474307 ties=2 D=989843192450
+DONE lo=67256580 hi=268435456 ties=5 mismatches=0 repasses=201178783

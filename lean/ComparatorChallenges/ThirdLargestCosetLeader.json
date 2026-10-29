@@ -1,0 +1,15 @@
+{
+  "challenge_module": "ComparatorChallenges.ThirdLargestCosetLeader",
+  "solution_module": "KOS.CodingTheory.ThirdLargestCosetLeader.Main",
+  "theorem_names": [
+    "CosetB.conjecture25_false",
+    "CosetB.counterexample_q4_m12"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

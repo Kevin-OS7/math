@@ -1,0 +1,11 @@
+n=2 graphs=1 groups=0
+n=3 graphs=2 groups=0
+n=4 graphs=6 groups=0
+n=5 graphs=21 groups=1
+  e=10.000000000000 spread=7.105e-15 [('D~{', 8.0), ('DUW', 6.472135955)]
+n=6 graphs=112 groups=0
+n=7 graphs=853 groups=1
+  e=14.000000000000 spread=2.132e-14 [('F~~~w', 12.0), ('FCp`_', 8.9879184149)]
+n=8 graphs=11117 groups=0
+n=9 graphs=261080 groups=1
+  e=18.000000000000 spread=5.684e-14 [('H~~~~~~', 16.0), ('H?bB@_W', 11.5175409663)]

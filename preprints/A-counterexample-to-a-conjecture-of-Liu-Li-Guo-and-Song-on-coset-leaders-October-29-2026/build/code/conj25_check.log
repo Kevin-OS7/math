@@ -1,0 +1,71 @@
+Part 1: Conjecture 25 for q in {2,4,8,16}, r in {2,3,4}, t in {1,2,3}
+q= 2 r=2 t=1 m= 6: leader(d1,d2,d3)=[True, True, True] top3=[13, 11, 7] d2_ok=True d3_ok=True d1_is_max=True
+q= 2 r=2 t=2 m=10: leader(d1,d2,d3)=[True, True, True] top3=[205, 179, 173] d2_ok=True d3_ok=True d1_is_max=True
+q= 2 r=2 t=3 m=14: leader(d1,d2,d3)=[True, True, True] top3=[3277, 2867, 2861] d2_ok=True d3_ok=True d1_is_max=True
+q= 2 r=3 t=1 m=12: leader(d1,d2,d3)=[True, True, False] d3=713 orbit_min=423 top3=[723, 717, 693] d2_ok=True d3_ok=False d1_is_max=True
+q= 2 r=3 t=2 m=20: leader(d1,d2,d3)=[True, True, True] top3=[185043, 183597, 183507] d2_ok=True d3_ok=True d1_is_max=True
+q= 2 r=3 t=3 m=28: leader(d1,d2,d3)=[True, True, True] top3=[47370963, 47000877, 47000787] d2_ok=True d3_ok=True
+q= 2 r=4 t=1 m=24: leader(d1,d2,d3)=[True, True, False] d3=2937551 orbit_min=1232173 top3=[2937645, 2937555, 2936115] d2_ok=True d3_ok=False d1_is_max=True
+q= 2 r=4 t=2 m=40: leader(d1,d2,d3)=[True, True, True]
+q= 2 r=4 t=3 m=56: leader(d1,d2,d3)=[True, True, True]
+q= 4 r=2 t=1 m= 6: leader(d1,d2,d3)=[True, True, True] top3=[1446, 1434, 1386] d2_ok=True d3_ok=True d1_is_max=True
+q= 4 r=2 t=2 m=10: leader(d1,d2,d3)=[True, True, True] top3=[370086, 367194, 367014] d2_ok=True d3_ok=True d1_is_max=True
+q= 4 r=2 t=3 m=14: leader(d1,d2,d3)=[True, True, True] top3=[94741926, 94001754, 94001574] d2_ok=True d3_ok=True
+q= 4 r=3 t=1 m=12: leader(d1,d2,d3)=[True, True, False] d3=5875062 orbit_min=2713238 top3=[5875290, 5875110, 5872230] d2_ok=True d3_ok=False d1_is_max=True
+q= 4 r=3 t=2 m=20: leader(d1,d2,d3)=[True, True, True]
+q= 4 r=3 t=3 m=28: leader(d1,d2,d3)=[True, True, True]
+q= 4 r=4 t=1 m=24: leader(d1,d2,d3)=[True, True, False] d3=98567995369002 orbit_min=45794457134682
+q= 4 r=4 t=2 m=40: leader(d1,d2,d3)=[True, True, True]
+q= 4 r=4 t=3 m=56: leader(d1,d2,d3)=[True, True, True]
+q= 8 r=2 t=1 m= 6: leader(d1,d2,d3)=[True, True, True] top3=[112924, 112868, 112420] d2_ok=True d3_ok=True d1_is_max=True
+q= 8 r=2 t=2 m=10: leader(d1,d2,d3)=[True, True, True] top3=[462534940, 462309092, 462305564] d2_ok=True d3_ok=True
+q= 8 r=2 t=3 m=14: leader(d1,d2,d3)=[True, True, True]
+q= 8 r=3 t=1 m=12: leader(d1,d2,d3)=[True, True, False] d3=29587781468 orbit_min=22069496028 top3=[29587785444, 29587781916, 29587556124] d2_ok=True d3_ok=False
+q= 8 r=3 t=2 m=20: leader(d1,d2,d3)=[True, True, True]
+q= 8 r=3 t=3 m=28: leader(d1,d2,d3)=[True, True, True]
+q= 8 r=4 t=1 m=24: leader(d1,d2,d3)=[True, True, False] d3=2033256891075991291172 orbit_min=1516748299454437770980
+q= 8 r=4 t=2 m=40: leader(d1,d2,d3)=[True, True, True]
+q= 8 r=4 t=3 m=56: leader(d1,d2,d3)=[True, True, True]
+q=16 r=2 t=1 m= 6: leader(d1,d2,d3)=[True, True, True] top3=[7833720, 7833480, 7829640] d2_ok=True d3_ok=True d1_is_max=True
+q=16 r=2 t=2 m=10: leader(d1,d2,d3)=[True, True, True]
+q=16 r=2 t=3 m=14: leader(d1,d2,d3)=[True, True, True]
+q=16 r=3 t=1 m=12: leader(d1,d2,d3)=[True, True, False] d3=131423993821560 orbit_min=114931051038584
+q=16 r=3 t=2 m=20: leader(d1,d2,d3)=[True, True, True]
+q=16 r=3 t=3 m=28: leader(d1,d2,d3)=[True, True, True]
+q=16 r=4 t=1 m=24: leader(d1,d2,d3)=[True, True, False] d3=36992565601225994370377345160 orbit_min=32350290471132086914197780360
+q=16 r=4 t=2 m=40: leader(d1,d2,d3)=[True, True, True]
+q=16 r=4 t=3 m=56: leader(d1,d2,d3)=[True, True, True]
+Part 2: corrected formula for t = 1
+q= 2 r=2 m=6: delta_2 is second largest: True; third largest leader 7, predicted 7, match=True
+q= 4 r=2 m=6: delta_2 is second largest: True; third largest leader 1386, predicted 1386, match=True
+q= 8 r=2 m=6: delta_2 is second largest: True; third largest leader 112420, predicted 112420, match=True
+q=16 r=2 m=6: delta_2 is second largest: True; third largest leader 7829640, predicted 7829640, match=True
+q= 2 r=3 m=12: delta_2 is second largest: True; third largest leader 693, predicted 693, match=True
+q= 4 r=3 m=12: delta_2 is second largest: True; third largest leader 5872230, predicted 5872230, match=True
+q= 8 r=3 m=12: delta_2 is second largest: True; third largest leader 29587556124, predicted 29587556124, match=True
+q=16 r=3 m=12: delta_2 is second largest: True; third largest leader 131423978158200, predicted 131423978158200, match=True
+q= 2 r=4 m=24: delta_2 is second largest: True; third largest leader 2936115, predicted 2936115, match=True
+q= 4 r=4 m=24: delta_2 is second largest: True; third largest leader 98567983618650, predicted 98567983618650, match=True
+q= 2 r=5 m=48: delta_2 is second largest: True; third largest leader 49283991809325, predicted 49283991809325, match=True
+q= 8 r=4 m=24: gap 59175567360 too large to scan; predicted value is a leader: True
+Part 3: the branch m = 2^r
+q= 2 m= 2: formulas give (1,0,-1); skipped
+q= 2 m= 4: formulas give (3,1,0); skipped
+q= 2 m= 8: leader(d1,d2,d3)=[True, True, True] top3=[45, 43, 37] d2_ok=True d3_ok=True d1_is_max=True
+q= 2 m=16: leader(d1,d2,d3)=[True, True, True] top3=[11475, 11469, 11443] d2_ok=True d3_ok=True d1_is_max=True
+q= 4 m= 2: leader(d1,d2,d3)=[True, True, True] top3=[6, 3, 2] d2_ok=True d3_ok=True d1_is_max=True
+q= 4 m= 4: leader(d1,d2,d3)=[True, True, True] top3=[90, 86, 45] d2_ok=True d3_ok=True d1_is_max=True
+q= 4 m= 8: leader(d1,d2,d3)=[True, True, True] top3=[22950, 22938, 22886] d2_ok=True d3_ok=True d1_is_max=True
+q= 4 m=16: leader(d1,d2,d3)=[True, True, True] top3=[1504028250, 1504028070, 1504025178] d2_ok=True d3_ok=True
+q= 8 m= 2: leader(d1,d2,d3)=[True, True, True] top3=[28, 21, 20] d2_ok=True d3_ok=True d1_is_max=True
+q= 8 m= 4: leader(d1,d2,d3)=[True, True, True] top3=[1764, 1756, 1323] d2_ok=True d3_ok=True d1_is_max=True
+q= 8 m= 8: leader(d1,d2,d3)=[True, True, True] top3=[7223580, 7223524, 7223068] d2_ok=True d3_ok=True d1_is_max=True
+q= 8 m=16: leader(d1,d2,d3)=[True, True, True]
+q=16 m= 2: leader(d1,d2,d3)=[True, True, True] top3=[120, 105, 104] d2_ok=True d3_ok=True d1_is_max=True
+q=16 m= 4: leader(d1,d2,d3)=[True, True, True] top3=[30600, 30584, 26775] d2_ok=True d3_ok=True d1_is_max=True
+q=16 m= 8: leader(d1,d2,d3)=[True, True, True] top3=[2005371000, 2005370760, 2005366904] d2_ok=True d3_ok=True
+q=16 m=16: leader(d1,d2,d3)=[True, True, True]
+
+real	0m32.503s
+user	0m30.450s
+sys	0m0.136s

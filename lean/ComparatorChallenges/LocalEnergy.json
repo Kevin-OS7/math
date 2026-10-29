@@ -1,0 +1,16 @@
+{
+  "challenge_module": "ComparatorChallenges.LocalEnergy",
+  "solution_module": "KOS.ChemicalGraphTheory.LocalEnergy.Main",
+  "theorem_names": [
+    "DedePopat.not_conjecture1",
+    "DedePopat.not_conjecture1NonEquienergetic",
+    "DedePopat.not_corollary2"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

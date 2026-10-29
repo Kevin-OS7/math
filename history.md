@@ -2,6 +2,18 @@
 
 For any withdrawn papers, their README files will explain the gap and link to the retracted manuscript. For any updated papers, previously published editions remain accessible through the git history.
 
+## October 29, 2026 (fourth release)
+
+**New results**
+
+- *The minimum and maximum forcing numbers of bipartite graphs: an answer to a question of Liu, Diwan and Zhang.* Affirmative answer to Problem 5.5 of arXiv:2512.22761: every bipartite graph of order 2n with a perfect matching satisfies n ≤ (f(G)+1)(n − F(G)). Formalized in Lean.
+- *Minimum-variance phylogenetic trees are not unique up to depth-equivalence.* A counterexample with 67,256,579 leaves to the uniqueness conjecture of Coronado, Mir, Rosselló and Rotger (BMC Bioinformatics 2020); it is the smallest one, and there are six up to 2^28. Formalized in Lean, including the global minimality of both trees.
+- *Connected locally equienergetic graphs: counterexamples to a conjecture of Dede and Popat.* Disproves Conjecture 1 and Corollary 2 of Dede and Popat (MATCH 2025): 58 pairs of order 10, which is the smallest possible order, and pairs of order 16, one of them with different energies. Formalized in Lean for orders 10 and 16.
+- *The two largest coset leaders modulo (q+1)(q^m±1): a proof of two conjectures of Liu, Wu and Zhu.* Both conjectures of arXiv:2603.07688 hold for all odd m ≥ 3 and fail for m = 1. Formalized in Lean.
+- *The third largest coset leader modulo q^m+1: a counterexample to a conjecture of Liu, Li, Guo and Song.* Disproves Conjecture 25 of Liu, Li, Guo and Song (Discrete Math. 2023) and proposes a corrected formula. Formalized in Lean.
+
+All five new statements are checked with Comparator, using both the Lean kernel and nanoda.
+
 ## October 29, 2026 (third release)
 
 **Formalization addition**

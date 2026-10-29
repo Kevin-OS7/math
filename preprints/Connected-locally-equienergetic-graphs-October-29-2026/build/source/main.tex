@@ -1,0 +1,559 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[no-math]{fontspec}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.82]
+\usepackage[margin=1.1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyvrb}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem*{dpcor}{Corollary~2 of \cite{DP}}
+\newtheorem*{dpconj}{Conjecture~1 of \cite{DP}}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\cE}{\mathcal{E}}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\Cay}{Cay}
+
+\title[Locally equienergetic graphs]{Connected locally equienergetic graphs:\\ counterexamples to a conjecture of Dede and Popat}
+
+\author{GPT-6-Astra}
+\author{Claude Fable 5.1}
+\author{Claude Opus 5.5}
+\thanks{The authors are AI models: GPT-6-Astra (OpenAI) and Claude Fable~5.1 and Claude Opus~5.5 (Anthropic). Source files, scripts and Lean code: \url{https://github.com/Kevin-OS7/math}.}
+
+\date{October 29, 2026}
+
+\begin{document}
+
+\begin{abstract}
+The energy of a graph is the sum of the absolute values of the eigenvalues of its adjacency matrix.
+The local energy of a graph is the sum, over all vertices $v$, of the decrease of the energy when $v$ is deleted.
+Dede and Popat called two graphs of the same order locally equienergetic if their local energies are equal.
+On the basis of a computer search they stated that, up to order $10$, the only pairs of connected locally equienergetic graphs are $(K_n,C_n)$ with $n$ odd, and they conjectured that there are no other pairs at all (MATCH Commun.\ Math.\ Comput.\ Chem.\ 93 (2025), Corollary~2 and Conjecture~1).
+We show that both statements are false.
+Among connected graphs of order at most $10$ there are exactly $58$ further pairs, all of order $10$.
+In each of them the two graphs have the same eigenvalues and angles, and they are related by a Godsil--McKay switching.
+At order $16$, the $4\times4$ rook's graph, the Shrikhande graph and the complement of the Clebsch graph all have local energy $64$, although the energy of the last graph is $40$ and that of the other two is $36$.
+More generally, cospectral walk-regular graphs are locally equienergetic, and a strongly regular graph of order $n$ whose eigenvalues $k>r\ge0>s$ satisfy a sign condition has local energy $2n|s|$.
+This gives infinite families of counterexamples, including pairs of graphs with different spectra.
+The counterexamples of orders $10$ and $16$ are verified in Lean~4.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Let $G$ be a finite simple graph with $n$ vertices and adjacency matrix $A(G)$.
+The energy of $G$ is $\cE(G)=\sum_{i=1}^n|\lambda_i|$, where $\lambda_1,\dots,\lambda_n$ are the eigenvalues of $A(G)$; see \cite{LSG} for background.
+For a vertex $v$, let $G-v$ denote the graph obtained from $G$ by deleting $v$.
+Espinal and Rada \cite{ER} studied the difference $\cE(G)-\cE(G-v)$, which is called the local energy of $G$ at $v$.
+Following \cite{ER,DP}, the local energy of $G$ is
+\[
+e(G)=\sum_{v\in V(G)}\bigl(\cE(G)-\cE(G-v)\bigr).
+\]
+Dede and Popat \cite{DP} call two graphs of the same order \emph{locally equienergetic} if their local energies are equal.
+As recalled in \cite{DP}, formulas of Espinal and Rada give $e(K_n)=2n$ for $n\ge2$ and $e(C_n)=2n$ for odd $n$.
+Hence $K_n$ and $C_n$ are locally equienergetic for odd $n$.
+Dede and Popat report an exhaustive computer search over the graphs of order at most $10$, list the classes of locally equienergetic graphs of orders $4$ to $8$, and state the following.
+
+\begin{dpcor}
+There exists no simple, undirected, and connected locally equienergetic graph of order $n\le10$ except the pair $(K_n,C_n)$ for odd $n$.
+\end{dpcor}
+
+\begin{dpconj}
+There exists no simple, undirected, and connected locally equienergetic graph other than the pair of locally equienergetic graphs $(K_n,C_n)$ for odd $n$.
+\end{dpconj}
+
+Every graph is locally equienergetic with any graph isomorphic to it.
+We therefore read both statements as statements about pairs of non-isomorphic graphs: if $G_1$ and $G_2$ are non-isomorphic connected graphs of the same order $n$ with $e(G_1)=e(G_2)$, then $n$ is odd and $\{G_1,G_2\}=\{K_n,C_n\}$ up to isomorphism.
+In Corollary~2 the order is restricted to $n\le10$.
+The definition of local equienergy in \cite{DP} does not exclude cospectral pairs.
+We show that both statements are false, and that the conclusion of Conjecture~1 also fails for pairs of graphs with different energies.
+
+\begin{theorem}\label{thm:10}
+Let $n\le10$.
+The pairs of non-isomorphic connected locally equienergetic graphs of order $n$ are $(K_n,C_n)$ for $n\in\{5,7,9\}$ and $58$ pairs of order $10$.
+In each of the $58$ pairs the two graphs have the same eigenvalues and angles, the same degree sequence and cospectral complements.
+In each pair, one graph is isomorphic to the graph obtained from the other by Godsil--McKay switching with respect to a set of four vertices.
+\end{theorem}
+
+Theorem~\ref{thm:10} is the result of a computer search, described in Section~\ref{sec:search}.
+It shows that Corollary~2 of \cite{DP} is false and that the smallest counterexample to Conjecture~1 has order $10$.
+The pair of order $10$ with the fewest edges is given explicitly in Section~\ref{sec:ten}, and the fact that it is a counterexample is verified in Lean.
+
+\begin{theorem}\label{thm:16}
+Let $R$ be the $4\times4$ rook's graph $K_4\square K_4$, let $S$ be the Shrikhande graph, and let $Q$ be the complement of the Clebsch graph.
+These three graphs are connected, have $16$ vertices and are pairwise non-isomorphic.
+They satisfy $e(R)=e(S)=e(Q)=64$, $\cE(R)=\cE(S)=36$ and $\cE(Q)=40$.
+\end{theorem}
+
+The pair $(R,S)$ is a pair of cospectral graphs.
+The pair $(R,Q)$ is not even equienergetic.
+So Conjecture~1 also fails if one requires, as is usual for equienergetic graphs, that the two graphs are not cospectral.
+
+Both examples are instances of two general mechanisms.
+Cospectral walk-regular graphs have the same eigenvalues and angles and are therefore locally equienergetic (Corollary~\ref{cor:walk}).
+A connected strongly regular graph of order $n$ with eigenvalues $k>r\ge0>s$ and multiplicities $1,f,g$ has local energy $2n|s|$ whenever $rs+k(fs+gr)\ge0$ (Proposition~\ref{prop:srg}).
+For example, the triangular graph $T(m)$ and the lattice graph $L_2(\ell)$ are locally equienergetic whenever $m(m-1)/2=\ell^2$ (Corollary~\ref{cor:fam}).
+This equation has infinitely many solutions, and the two graphs have different degrees.
+
+The following are verified in Lean~4 with Mathlib (Section~\ref{sec:lean}): the energies and local energies in Theorem~\ref{thm:16}, the connectivity of $R$, $S$ and $Q$, the facts $R\not\cong S$ and $R\not\cong Q$, the refutation of Conjecture~1 by the pairs $(R,S)$ and $(R,Q)$, and the refutation of Corollary~2 and Conjecture~1 by the explicit pair of order $10$.
+
+\section{Vertex-deleted subgraphs and angles}\label{sec:angles}
+
+Let $\phi(G,x)=\det(xI-A(G))$ be the characteristic polynomial.
+For a polynomial $p$ with only real roots, let $\cE(p)$ be the sum of the absolute values of its roots, counted with multiplicity.
+Then $\cE(G)=\cE(\phi(G,x))$ and
+\begin{equation}\label{eq:e}
+e(G)=n\,\cE\bigl(\phi(G,x)\bigr)-\sum_{v\in V(G)}\cE\bigl(\phi(G-v,x)\bigr).
+\end{equation}
+So $e(G)$ depends only on $\phi(G,x)$ and on the multiset $\{\phi(G-v,x):v\in V(G)\}$.
+
+Let $\theta_1>\dots>\theta_d$ be the distinct eigenvalues of $A=A(G)$, with multiplicities $f_1,\dots,f_d$, and let $P_i$ be the orthogonal projection onto the eigenspace of $\theta_i$.
+The numbers $\alpha_{iv}=\|P_ie_v\|$ are the \emph{angles} of $G$ \cite{CRS}.
+
+\begin{lemma}\label{lem:angles}
+For every vertex $v$ of $G$,
+\[
+\frac{\phi(G-v,x)}{\phi(G,x)}=\bigl((xI-A)^{-1}\bigr)_{vv}=\sum_{i=1}^d\frac{\alpha_{iv}^2}{x-\theta_i}.
+\]
+\end{lemma}
+
+\begin{proof}
+The polynomial $\phi(G-v,x)$ is the $(v,v)$ cofactor of $xI-A$, which gives the first equality.
+The second follows from $(xI-A)^{-1}=\sum_i(x-\theta_i)^{-1}P_i$ and $(P_i)_{vv}=\|P_ie_v\|^2$.
+\end{proof}
+
+Since $\sum_v\alpha_{iv}^2=\tr P_i=f_i$, summing Lemma~\ref{lem:angles} over $v$ gives Jacobi's formula $\sum_v\phi(G-v,x)=\phi'(G,x)$.
+
+We say that two graphs $G$ and $H$ have the \emph{same eigenvalues and angles} if $\phi(G,x)=\phi(H,x)$ and there is a bijection $\pi\colon V(G)\to V(H)$ such that $\alpha^G_{iv}=\alpha^H_{i\pi(v)}$ for all $i$ and $v$.
+
+\begin{lemma}\label{lem:deck}
+Let $\phi(G,x)=\phi(H,x)$.
+Then $G$ and $H$ have the same eigenvalues and angles if and only if there is a bijection $\pi\colon V(G)\to V(H)$ with $\phi(G-v,x)=\phi(H-\pi(v),x)$ for all $v$.
+In that case $e(G)=e(H)$.
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{lem:angles}, for fixed $\phi(G,x)$ the polynomial $\phi(G-v,x)$ determines the numbers $\alpha_{iv}^2$ as residues at the poles $\theta_i$, and conversely.
+The last claim follows from~\eqref{eq:e}.
+\end{proof}
+
+A graph is \emph{walk-regular} if $(A^j)_{vv}$ does not depend on $v$, for every $j\ge0$ \cite{GM80}.
+Vertex-transitive graphs are walk-regular.
+So are strongly regular graphs: if $A^2=kI+\lambda A+\mu(J-I-A)$ and $AJ=kJ$, then every power of $A$ is a linear combination of $I$, $A$ and $J$.
+
+\begin{lemma}\label{lem:walk}
+If $G$ is walk-regular of order $n$, then $\phi(G-v,x)=\phi'(G,x)/n$ for every vertex $v$.
+\end{lemma}
+
+\begin{proof}
+For $|x|$ larger than the spectral radius, $((xI-A)^{-1})_{vv}=\sum_{j\ge0}(A^j)_{vv}\,x^{-j-1}$ does not depend on $v$.
+By Lemma~\ref{lem:angles}, neither does $\phi(G-v,x)$.
+Jacobi's formula then gives $n\,\phi(G-v,x)=\phi'(G,x)$.
+\end{proof}
+
+\begin{corollary}\label{cor:walk}
+Cospectral walk-regular graphs $G$ and $H$ of order $n$ have the same eigenvalues and angles.
+Hence they are locally equienergetic, and $e(G)=e(H)=n\bigl(\cE(\phi)-\cE(\phi'/n)\bigr)$ with $\phi=\phi(G,x)$.
+\end{corollary}
+
+So every pair of non-isomorphic, cospectral, connected, walk-regular graphs is a counterexample to Conjecture~1.
+Examples are pairs of non-isomorphic strongly regular graphs with the same parameters, such as $R$ and $S$ in Theorem~\ref{thm:16}, and pairs of cospectral vertex-transitive graphs (Remark~\ref{rem:twelve}).
+
+\section{Strongly regular graphs}\label{sec:srg}
+
+Let $G$ be a connected strongly regular graph with parameters $(n,k,\lambda,\mu)$ that is not complete.
+It is well known that $A(G)$ has exactly three distinct eigenvalues $k>r>s$, with multiplicities $1,f,g$, where $r$ and $s$ are the roots of $x^2-(\lambda-\mu)x-(k-\mu)$.
+Since $\tr A(G)=0$, we have $k+fr+gs=0$.
+
+\begin{proposition}\label{prop:srg}
+Let $G$ be a connected strongly regular graph of order $n$ with eigenvalues $k>r>s$ of multiplicities $1,f,g$.
+Suppose that $r\ge0$ and $rs+k(fs+gr)\ge0$.
+Then $\cE(G)-\cE(G-v)=2|s|$ for every vertex $v$, and $e(G)=2n|s|$.
+\end{proposition}
+
+\begin{proof}
+Since $k>0$, $r\ge0$ and $k+fr+gs=0$, we have $s<0$.
+By Lemma~\ref{lem:walk} and $\phi(G,x)=(x-k)(x-r)^f(x-s)^g$,
+\[
+\phi(G-v,x)=\frac{\phi'(G,x)}{n}=(x-r)^{f-1}(x-s)^{g-1}q(x),
+\]
+where $n\,q(x)=(x-r)(x-s)+f(x-k)(x-s)+g(x-k)(x-r)$.
+We have $n\,q(k)>0$, $n\,q(r)=f(r-k)(r-s)<0$ and $n\,q(s)=g(s-k)(s-r)>0$.
+So $q$ has a root $\rho_1\in(r,k)$ and a root $\rho_2\in(s,r)$, and $\rho_1>0$.
+Moreover $n\,q(0)=rs+k(fs+gr)\ge0$.
+If $\rho_2<0$, then $0$ would lie strictly between the roots of $q$ and $q(0)<0$.
+Hence $\rho_2\ge0$.
+The trace of $A(G-v)$ is zero, so $(f-1)r+(g-1)s+\rho_1+\rho_2=0$.
+Together with $k+fr+gs=0$ this gives $\rho_1+\rho_2=k+r+s$.
+Therefore
+\[
+\cE(G-v)=(f-1)r+(g-1)|s|+\rho_1+\rho_2=(f-1)r+(g-1)|s|+k+r+s,
+\]
+while $\cE(G)=k+fr+g|s|$.
+Subtracting gives $\cE(G)-\cE(G-v)=|s|-s=2|s|$.
+\end{proof}
+
+\begin{remark}
+The sign condition cannot be omitted.
+For the Petersen graph ($k=3$, $r=1$, $s=-2$, $f=5$, $g=4$) we have $rs+k(fs+gr)=-20$.
+Here $\phi(G-v,x)=(x-1)^4(x+2)^3(x^2-2x-2)$, and the roots $1\pm\sqrt3$ of the last factor have opposite signs.
+This gives $e(G)=10\bigl(16-(10+2\sqrt3)\bigr)=60-20\sqrt3$.
+\end{remark}
+
+The lattice graph $L_2(\ell)=K_\ell\square K_\ell$ has eigenvalues $2\ell-2$, $\ell-2$, $-2$ with multiplicities $1$, $2(\ell-1)$, $(\ell-1)^2$.
+For it,
+\[
+rs+k(fs+gr)=-2(\ell-2)+2(\ell-1)^2\bigl((\ell-1)(\ell-2)-4\bigr),
+\]
+which equals $32$ for $\ell=4$ and is positive for all $\ell\ge4$.
+The triangular graph $T(m)=L(K_m)$ has eigenvalues $2m-4$, $m-4$, $-2$ with multiplicities $1$, $m-1$, $m(m-3)/2$.
+For it,
+\[
+rs+k(fs+gr)=-2(m-4)+2(m-2)\Bigl(\frac{m(m-3)(m-4)}2-2(m-1)\Bigr),
+\]
+which equals $60$ for $m=6$ and is positive for all $m\ge6$.
+Proposition~\ref{prop:srg} gives
+\[
+e\bigl(L_2(\ell)\bigr)=4\ell^2\quad(\ell\ge4),\qquad e\bigl(T(m)\bigr)=2m(m-1)\quad(m\ge6).
+\]
+
+\begin{corollary}\label{cor:fam}
+Let $m\ge6$ and $\ell\ge4$ satisfy $m(m-1)/2=\ell^2$.
+Then $T(m)$ and $L_2(\ell)$ are connected graphs of order $\ell^2$, and $e(T(m))=e(L_2(\ell))=4\ell^2$.
+Their degrees $2m-4$ and $2\ell-2$ are different, so they are not cospectral.
+The equation $m(m-1)/2=\ell^2$ is equivalent to $(2m-1)^2-8\ell^2=1$ and has infinitely many solutions, beginning with $(m,\ell)=(9,6),(50,35),(289,204)$.
+\end{corollary}
+
+\begin{proof}
+Only the claim about the degrees needs comment.
+If $2m-4=2\ell-2$, then $m=\ell+1$ and $(\ell+1)\ell/2=\ell^2$, so $\ell=1$.
+\end{proof}
+
+For example, $T(9)$ and $L_2(6)$ have $36$ vertices, degrees $14$ and $10$, and local energy $144$.
+We confirmed $e(T(9))=e(L_2(6))=144$ and $e(T(50))=e(L_2(35))=4900$ numerically.
+
+\section{Three graphs of order 16}\label{sec:sixteen}
+
+Let $\mathbb{Z}_4^2=\mathbb{Z}_4\times\mathbb{Z}_4$.
+For a set $C\subseteq\mathbb{Z}_4^2\setminus\{0\}$ with $C=-C$, the Cayley graph $\Cay(\mathbb{Z}_4^2,C)$ has vertex set $\mathbb{Z}_4^2$, and $x\sim y$ if and only if $x-y\in C$.
+Cayley graphs are vertex-transitive.
+We use
+\begin{align*}
+C_R&=\{(0,\pm1),(0,2),(\pm1,0),(2,0)\},\\
+C_S&=\{\pm(1,0),\pm(0,1),\pm(1,1)\},\\
+C_Q&=C_R\cup\{(\pm1,\pm1)\},
+\end{align*}
+and put $R=\Cay(\mathbb{Z}_4^2,C_R)$, $S=\Cay(\mathbb{Z}_4^2,C_S)$ and $Q=\Cay(\mathbb{Z}_4^2,C_Q)$.
+In $R$, two distinct vertices are adjacent if and only if they agree in one coordinate, so $R=K_4\square K_4=L_2(4)$.
+The graph $S$ is the Shrikhande graph \cite{Shr}.
+In a Cayley graph the number of common neighbours of $x$ and $y$ is the number of $c\in C$ with $x-y-c\in C$.
+A direct count shows that $S$ is strongly regular with parameters $(16,6,2,2)$ and that $Q$ is strongly regular with parameters $(16,10,6,6)$.
+We checked by computer that $Q$ is isomorphic to the complement of the Clebsch graph.
+Here the Clebsch graph is the Cayley graph of $\mathbb{Z}_2^4$ whose connection set consists of the four unit vectors and the all-ones vector.
+
+\begin{proof}[Proof of Theorem~\ref{thm:16}]
+The data are collected in Table~\ref{tab:16}.
+The graphs $R$ and $S$ have eigenvalues $6,2,-2$ with multiplicities $1,6,9$.
+So $\cE(R)=\cE(S)=6+12+18=36$, and $rs+k(fs+gr)=-4+6(-12+18)=32$.
+The graph $Q$ has eigenvalues $10,2,-2$ with multiplicities $1,5,10$.
+So $\cE(Q)=10+10+20=40$, and $rs+k(fs+gr)=-4+10(-10+20)=96$.
+By Proposition~\ref{prop:srg}, $e(R)=e(S)=e(Q)=2\cdot16\cdot2=64$.
+The deleted graphs have
+\[
+\phi(R-v)=\phi(S-v)=(x-2)^5(x+2)^8(x^2-6x+2),\qquad \phi(Q-v)=(x-2)^4(x+2)^9(x^2-10x+6),
+\]
+whose quadratic factors have the positive roots $3\pm\sqrt7$ and $5\pm\sqrt{19}$.
+Strongly regular graphs with $\mu>0$ have diameter $2$, so the three graphs are connected.
+Each row of $R$ induces a $K_4$.
+In $S$, the neighbourhood $C_S$ of $0$ induces the $6$-cycle
+\[
+(1,0),\ (1,1),\ (0,1),\ (3,0),\ (3,3),\ (0,3),
+\]
+which has no triangle.
+So no $K_4$ of $S$ contains $0$, and since $S$ is vertex-transitive, $S$ contains no $K_4$.
+Hence $R\not\cong S$.
+Finally, $Q$ is $10$-regular, while $R$ and $S$ are $6$-regular.
+\end{proof}
+
+\begin{table}[ht]
+\caption{The graphs of Theorem~\ref{thm:16}. Here $v$ is any vertex.}\label{tab:16}
+\begin{tabular}{lccccc}
+\toprule
+graph & parameters & spectrum & $\cE(G)$ & $\cE(G-v)$ & $e(G)$\\
+\midrule
+$R=K_4\square K_4$ & $(16,6,2,2)$ & $6^1,\ 2^6,\ (-2)^9$ & $36$ & $32$ & $64$\\
+$S$ (Shrikhande) & $(16,6,2,2)$ & $6^1,\ 2^6,\ (-2)^9$ & $36$ & $32$ & $64$\\
+$Q$ (co-Clebsch) & $(16,10,6,6)$ & $10^1,\ 2^5,\ (-2)^{10}$ & $40$ & $36$ & $64$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The equality $e(R)=e(S)$ also has a direct certificate.
+Let $T=\{(0,1),(1,0),(2,2),(3,3)\}$.
+It is an independent set of $R$, and every vertex outside $T$ has exactly two neighbours in $T$, namely the elements of $T$ in its row and in its column.
+Godsil--McKay switching \cite{GM82} with respect to $T$ therefore turns $R$ into a cospectral graph, and this graph is isomorphic to $S$.
+The switching matrix is $M=\mathrm{diag}(\tfrac12J-I,\,I)$, which is orthogonal.
+Composing $2M$ with the permutation matrix of an isomorphism onto $S$ that fixes $(0,0)$ gives an integer matrix $P$ with $PA(R)=A(S)P$ and $PP^{\mathsf T}=4I$.
+Since $(0,0)\notin T$, the matrix $P$ maps $e_{(0,0)}$ to $2e_{(0,0)}$.
+So deleting the row and the column of $(0,0)$ gives a certificate of the same kind for $R-(0,0)$ and $S-(0,0)$.
+This is the certificate used in the formal proof.
+
+\section{The exhaustive search up to order 10}\label{sec:search}
+
+We computed the local energy of every connected graph of order at most $10$.
+The graphs were generated by \texttt{geng -c} from nauty \cite{MP}, one graph per isomorphism class.
+Table~\ref{tab:search} lists the numbers of graphs.
+The method has three steps.
+\begin{enumerate}
+\item \emph{Floating point.} For each graph, $e(G)$ was computed in double precision with a symmetric eigenvalue solver, using~\eqref{eq:e}.
+The values were sorted, and consecutive values closer than a tolerance $\tau$ were put into the same group of candidates; we used $\tau=10^{-8}$ for $n\le9$ and $\tau=10^{-10}$ for $n=10$.
+\item \emph{Exact equality.} For each pair of graphs in a group, the integer characteristic polynomials $\phi(G,x)$ and the multisets $\{\phi(G-v,x)\}$ were computed exactly by the Faddeev--LeVerrier algorithm.
+If they agree for both graphs, the local energies are equal by Lemma~\ref{lem:deck}.
+\item \emph{Inequality.} Otherwise, both local energies were recomputed with $30$ significant digits.
+A pair is declared unequal if the difference exceeds $10^{-20}$.
+\end{enumerate}
+The only pairs that were equal but not settled by step~2 are the pairs $(K_n,C_n)$, whose local energies are equal by the formulas of Espinal and Rada.
+
+For $n\le8$ the only candidate groups are the pairs $(K_5,C_5)$ and $(K_7,C_7)$.
+For $n=9$ there are $112$ groups, and steps~2 and~3 settle all of them: the pair $(K_9,C_9)$, whose $30$-digit values differ by about $10^{-29}$, and $111$ unequal pairs, the closest of which differ by about $1.9\cdot10^{-10}$.
+
+For $n=10$ there are $2187$ groups.
+Steps~2 and~3 give exactly $58$ pairs with the same eigenvalues and angles, and $2131$ unequal pairs.
+The smallest difference between the local energies of an unequal pair is about $1.3\cdot10^{-14}$.
+
+Only step~1 is not exact.
+For the $58$ pairs with equal local energy, the double-precision values differ by at most $1.5\cdot10^{-13}$, three orders of magnitude below $\tau$.
+For pairs in different groups, the computed values differ by at least $\tau$.
+
+We checked the following properties of the $58$ pairs independently of the search.
+In each pair the graphs are connected and non-isomorphic, and they have the same characteristic polynomial and the same multiset of vertex-deleted characteristic polynomials.
+They also have the same degree sequence and cospectral complements.
+In each pair, one graph is isomorphic to the graph obtained from the other by Godsil--McKay switching with respect to four vertices.
+The numbers of edges range from $16$ to $29$, and exactly one pair has $16$ edges.
+This proves Theorem~\ref{thm:10}, up to the floating-point step.
+The programs are \texttt{order10/le\_scan.py}, \texttt{order10/exact\_pairs.py}, \texttt{order10/exact\_check.py} and \texttt{order10/verify58.py}.
+The list of the $58$ pairs, in graph6 format, is \texttt{order10/pairs10.txt}.
+
+\begin{table}[ht]
+\caption{Connected graphs of order $n$ and their pairs of non-isomorphic locally equienergetic graphs.}\label{tab:search}
+\begin{tabular}{rrl}
+\toprule
+$n$ & connected graphs & locally equienergetic pairs\\
+\midrule
+$\le4$ & $10$ & none\\
+$5$ & $21$ & $(K_5,C_5)$\\
+$6$ & $112$ & none\\
+$7$ & $853$ & $(K_7,C_7)$\\
+$8$ & $11117$ & none\\
+$9$ & $261080$ & $(K_9,C_9)$\\
+$10$ & $11716571$ & $58$ pairs, all with the same eigenvalues and angles\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{The pair of order 10}\label{sec:ten}
+
+Let $G$ and $H$ be the graphs on the vertex set $\{0,1,\dots,9\}$ with the edges listed in Table~\ref{tab:ten}.
+In graph6 format they are \verb|I?qa``kWo| and \verb|ICOeeOwFG|.
+Both have $16$ edges and degree sequence $(4,4,4,4,3,3,3,3,2,2)$, and both are connected.
+Their characteristic polynomial is
+\[
+\phi(G,x)=\phi(H,x)=x^2(x-2)(x+2)^3(x^2-2)(x^2-4x+2),
+\]
+and $\cE(G)=\cE(H)=12+2\sqrt2$.
+Their local energy is $e(G)=e(H)=21.2203488379522\ldots$
+
+\begin{table}[ht]
+\caption{The pair of order $10$ with the fewest edges.}\label{tab:ten}
+\begin{tabular}{ll}
+\toprule
+graph & edges\\
+\midrule
+$G$ & 04 05 14 16 18 19 25 27 28 29 36 37 48 58 69 79\\
+$H$ & 03 06 07 14 16 17 25 28 36 38 39 47 48 49 59 89\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{proposition}\label{prop:ten}
+The graphs $G$ and $H$ are connected, non-isomorphic and locally equienergetic.
+More precisely, let $\pi$ be the permutation $(0\,2\,4)(1\,3\,5)(6\,7)(8\,9)$ of $\{0,\dots,9\}$.
+Then $\phi(G-v,x)=\phi(H-\pi(v),x)$ for every vertex $v$.
+\end{proposition}
+
+\begin{proof}
+The sets $C_1=\{0,6,7,8\}$ and $C_2=\{3,4,5,9\}$ are independent in $G$.
+Every vertex outside $C_i$ has exactly two neighbours in $C_i$.
+Let $G_i$ be the graph obtained from $G$ by Godsil--McKay switching with respect to $C_i$.
+This means that every vertex outside $C_i$ exchanges its two neighbours in $C_i$ for the other two vertices of $C_i$.
+By \cite{GM82}, $G_i$ is cospectral with $G$.
+A computer check shows that $G_1$ and $G_2$ are both isomorphic to $H$.
+
+Let $v\notin C_i$.
+Deleting $v$ preserves the switching conditions, and switching $G-v$ with respect to $C_i$ gives $G_i-v$.
+So $G-v$ is cospectral with $G_i-v$, which is isomorphic to $H-\sigma_i(v)$ for an isomorphism $\sigma_i\colon G_i\to H$.
+Every vertex lies outside $C_1$ or outside $C_2$, because $C_1\cap C_2=\emptyset$.
+The isomorphisms $\sigma_1$ and $\sigma_2$ can be chosen so that $\sigma_2$ on $C_1$ and $\sigma_1$ on the other six vertices together give the permutation $\pi$.
+This gives $\phi(G-v,x)=\phi(H-\pi(v),x)$ for all $v$, and $e(G)=e(H)$ by Lemma~\ref{lem:deck}.
+
+The graph $H$ contains the triangles $\{8,9,3\}$ and $\{8,9,4\}$, which share the edge $\{8,9\}$.
+The four triangles of $G$ are $\{1,4,8\}$, $\{1,6,9\}$, $\{2,7,9\}$ and $\{2,5,8\}$, and any two of them share at most one vertex.
+Hence $G\not\cong H$.
+The diameters are also different: $G$ has diameter $4$ and $H$ has diameter $3$.
+\end{proof}
+
+Since $10$ is even, the pair $(G,H)$ is not of the form $(K_n,C_n)$ with $n$ odd.
+So it is a counterexample both to Corollary~2 and to Conjecture~1 of \cite{DP}.
+The switching argument also provides the certificates for the formal proof.
+Let $M_i=\mathrm{diag}(\tfrac12J-I,\,I)$ be the switching matrix for $C_i$.
+Then $P_i=2\Pi_{\sigma_i}M_i$ is an integer matrix with entries in $\{0,\pm1,2\}$, where $\Pi_{\sigma_i}$ is the permutation matrix of $\sigma_i$.
+It satisfies $P_iA(G)=A(H)P_i$ and $P_iP_i^{\mathsf T}=4I$.
+For $v\notin C_i$, deleting row $\pi(v)$ and column $v$ of $P_i$ gives a matrix $P$ with $PA(G-v)=A(H-\pi(v))P$ and $PP^{\mathsf T}=4I$.
+
+\begin{remark}\label{rem:twelve}
+There are also cospectral vertex-transitive counterexamples of order $12$.
+Let $C_{12}(1,2)$ be the Cayley graph of $\mathbb{Z}_{12}$ with connection set $\{\pm1,\pm2\}$.
+Let $D_6=\langle r,s\mid r^6=s^2=1,\ srs=r^{-1}\rangle$ be the dihedral group of order $12$.
+Let $X=\Cay(D_6,\{s,rs,r^3,r^3s\})$, in which $g$ is adjacent to $gt$ for each $t$ in the connection set.
+The graph $X$ consists of three copies of $K_4$, on the cosets of the subgroup $\{1,r^3,s,r^3s\}$, joined by the perfect matching $g\mapsto g\,rs$.
+Both graphs are connected and $4$-regular, and both have characteristic polynomial
+\[
+x^3(x-4)(x+2)^4(x^2-2x-2)^2.
+\]
+They are not isomorphic, because $X$ contains $K_4$ and $C_{12}(1,2)$ does not.
+By Corollary~\ref{cor:walk} they are locally equienergetic, with $e=23.6933935\ldots$
+We found these graphs in a numerical survey of the connected Cayley graphs of all groups of order at most $15$.
+In that survey, the only other coincidences of local energy were the pairs $(K_n,C_n)$ for odd $n$ and three further cospectral pairs of order $12$.
+\end{remark}
+
+\section{Formal verification}\label{sec:lean}
+
+The definitions, the statements and the counterexamples were formalized in Lean~4 (version 4.33.1) with Mathlib.
+The energy is defined through the eigenvalues of the real adjacency matrix, which is Hermitian.
+The graph $G-v$ is the subgraph induced on the complement of $\{v\}$.
+Figure~\ref{fig:defs} shows the definitions.
+
+\begin{figure}[t]
+\begin{Verbatim}[fontsize=\small,frame=single]
+noncomputable def energy {V : Type*} [Fintype V] (G : SimpleGraph V) : ℝ := by
+  classical
+  exact ∑ i, |(G.isHermitian_adjMatrix ℝ).eigenvalues i|
+
+noncomputable def localVertexEnergy {V : Type*} [Fintype V]
+    (G : SimpleGraph V) (v : V) : ℝ := by
+  classical
+  exact energy G - energy (G.induce ({v}ᶜ : Set V))
+
+noncomputable def localEnergy {V : Type*} [Fintype V]
+    (G : SimpleGraph V) : ℝ :=
+  ∑ v, localVertexEnergy G v
+\end{Verbatim}
+\caption{The definitions of energy and local energy.}\label{fig:defs}
+\end{figure}
+
+Two graphs are locally equienergetic if they have the same number of vertices and the same local energy.
+The proposition \texttt{Conjecture1} says the following.
+For all finite vertex types $V_1,V_2$ and graphs $G_1,G_2$, if $G_1$ and $G_2$ are connected, not isomorphic and locally equienergetic, then the order $n$ is odd and the pair is isomorphic to $(K_n,C_n)$ or to $(C_n,K_n)$.
+Here $K_n$ is the complete graph on \texttt{Fin n} and $C_n$ is Mathlib's \texttt{cycleGraph n}.
+The proposition \texttt{Corollary2} adds the hypothesis $n\le10$.
+The proposition \texttt{Conjecture1NonEquienergetic} replaces the hypothesis that the graphs are not isomorphic by the hypothesis that their energies differ.
+The statement file \texttt{ComparatorChallenges/LocalEnergy.lean} of the repository contains these definitions and the three statements \mbox{\texttt{¬ Conjecture1}}, \mbox{\texttt{¬ Conjecture1NonEquienergetic}} and \mbox{\texttt{¬ Corollary2}}.
+The proof file \texttt{KOS/ChemicalGraphTheory/LocalEnergy/Main.lean} begins with the same definitions, copied verbatim, and proves all three statements; Comparator confirms that it proves exactly the statements of the statement file.
+
+The theorem \mbox{\texttt{not\_conjecture1}} is proved with the pair $(R,S)$.
+The proof file also proves the following:
+\begin{itemize}
+\item the values $\cE=36,36,40$, $\cE(G-v)=32,32,36$ and $e=64$ for $R$, $S$ and $Q$;
+\item the theorem \texttt{not\_conjecture1NonEquienergetic}, which refutes the variant of Conjecture~1 that only considers pairs of graphs with different energies, with the pair $(R,Q)$.
+\end{itemize}
+
+For the pair of order $10$ it proves three theorems:
+\begin{itemize}
+\item \texttt{order10\_counterexample}: $G$ and $H$ are connected, not isomorphic and have equal local energy;
+\item \texttt{not\_corollary2};
+\item \texttt{not\_conjecture1\_order10}.
+\end{itemize}
+
+The proofs reduce everything to finite computations in four steps.
+\begin{itemize}
+\item Mathlib's description of the characteristic polynomial of a Hermitian matrix shows that the energy is the sum of the absolute values of the roots of the characteristic polynomial.
+\item An integer matrix $P$ with $PA=BP$ and $PP^{\mathsf T}=4I$ then shows that two graphs have the same energy.
+\item Vertex-deleted subgraphs are identified with graphs on \texttt{Fin 15} or \texttt{Fin 9}.
+\item All finite facts are checked by the kernel with \texttt{decide}: the certificate identities, connectivity, the forbidden subgraphs used for non-isomorphism, and the integer identities and traces used for the exact energies.
+\end{itemize}
+The exact values use a lemma of the following form: if $p(A)=0$ and $g$ agrees with $|x|$ on the roots of $p$, then $\cE=\tr g(A)$.
+The proof of that lemma uses the continuous functional calculus in Mathlib.
+For example, $(A-6)(A-2)(A+2)=0$ for $A=A(R)$ and $g(x)=\tfrac32+\tfrac{x^2}8$.
+
+Checking the proof file takes about one minute on one core.
+All main theorems depend only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+The general results of Sections~\ref{sec:angles} and~\ref{sec:srg}, the search of Section~\ref{sec:search} and Remark~\ref{rem:twelve} are not formalized.
+
+\subsection*{Author contributions}
+GPT-6-Astra, acting as an advisor surveying open problems, identified the conjecture and proposed the pair $(R,S)$, which it checked in exact arithmetic.
+Claude Opus~5.5 did the following:
+\begin{itemize}
+\item verified the pair $(R,S)$;
+\item found the pair $(R,Q)$ and the general mechanisms of Sections~\ref{sec:angles} and~\ref{sec:srg};
+\item formalized the results in Lean;
+\item carried out the exhaustive search for $n\le10$;
+\item formalized the pair of order $10$;
+\item wrote the manuscript.
+\end{itemize}
+Claude Fable~5.1 refereed the proofs and the formalization, and verified the spectra and the example of order $12$ independently.
+A human operator initiated the project and provided computing resources; the mathematics, the formal proofs and the text were produced by the models.
+
+\begin{thebibliography}{9}
+
+\bibitem{CRS}
+D.~Cvetkovi\'c, P.~Rowlinson and S.~Simi\'c,
+\emph{Eigenspaces of Graphs},
+Cambridge University Press, Cambridge, 1997.
+
+\bibitem{DP}
+C.~Dede and K.~M.~Popat,
+\emph{Locally equienergetic graphs},
+MATCH Commun. Math. Comput. Chem. \textbf{93} (2025), no.~3, 759--766; doi:10.46793/match.93-3.759D; arXiv:2604.14686.
+
+\bibitem{ER}
+C.~Espinal and J.~Rada,
+\emph{Graph energy change due to vertex deletion},
+MATCH Commun. Math. Comput. Chem. \textbf{92} (2024), no.~1, 89--103; doi:10.46793/match.92-1.089E.
+
+\bibitem{GM80}
+C.~D.~Godsil and B.~D.~McKay,
+\emph{Feasibility conditions for the existence of walk-regular graphs},
+Linear Algebra Appl. \textbf{30} (1980), 51--61.
+
+\bibitem{GM82}
+C.~D.~Godsil and B.~D.~McKay,
+\emph{Constructing cospectral graphs},
+Aequationes Math. \textbf{25} (1982), 257--268.
+
+\bibitem{LSG}
+X.~Li, Y.~Shi and I.~Gutman,
+\emph{Graph Energy},
+Springer, New York, 2012.
+
+\bibitem{MP}
+B.~D.~McKay and A.~Piperno,
+\emph{Practical graph isomorphism, II},
+J. Symbolic Comput. \textbf{60} (2014), 94--112.
+
+\bibitem{Shr}
+S.~S.~Shrikhande,
+\emph{The uniqueness of the $L_2$ association scheme},
+Ann. Math. Statist. \textbf{30} (1959), 781--798.
+
+\end{thebibliography}
+
+\end{document}

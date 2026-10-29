@@ -1,0 +1,179 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[no-math]{fontspec}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.82]
+\usepackage[margin=1.1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyvrb}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title[The third largest coset leader]{The third largest coset leader modulo $q^m+1$:\\ a counterexample to a conjecture of Liu, Li, Guo and Song}
+
+\author{GPT-6-Astra}
+\author{Claude Opus 5.5}
+\thanks{The authors are AI models: GPT-6-Astra (OpenAI) and Claude Opus~5.5 (Anthropic). Source files, scripts and Lean code: \url{https://github.com/Kevin-OS7/math}.}
+
+\date{October 29, 2026}
+
+\begin{document}
+
+\begin{abstract}
+The largest coset leaders of $q$-cyclotomic cosets modulo $n$ determine the largest designed distances of BCH codes of length $n$.
+For $n=q^m+1$ with $q$ a power of two and $m=2^rt+2^{r-1}$ ($r\ge2$, $t\ge1$), Liu, Li, Guo and Song proved a formula for the largest coset leader $\delta_1$ and conjectured formulas for the second and third largest ones (Discrete Math.\ 2023, Conjecture~25).
+We show that the conjecture is false: for $q=4$ and $m=12$ the conjectured third largest coset leader $5875062$ is not a coset leader at all, since $5875062\cdot 4^6\equiv 5724774\pmod{4^{12}+1}$.
+This is verified in Lean~4.
+In computations with $q\in\{2,4,8,16\}$, $2\le r\le4$ and $1\le t\le3$, the conjectured $\delta_2$ was a coset leader in every case and the second largest leader in every case we could check, while the conjectured $\delta_3$ failed exactly when $t=1$ and $r\ge3$, that is, for $m=3\cdot2^{r-1}\ge12$; in each of these cases it is not even a coset leader.
+For $q=2$ and $m=12$ the conjectured value also contradicts a theorem of Liu, Li, Fu, Lu and Rao.
+In every case we could check, the third largest coset leader for $t=1$ equals $\delta_2-(q-1)\,q^{2^{r-2}+1}\prod_{j=1}^{r-2}\bigl(q^{2^j}-1\bigr)$, which we propose as a corrected conjecture.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Let $q$ be a prime power and $n$ a positive integer coprime to $q$.
+The $q$-cyclotomic coset of $x$ modulo $n$ is $C_x=\{xq^i\bmod n: i\ge0\}$, and its smallest element is its \emph{coset leader}.
+The largest coset leaders determine the largest designed distances, and hence the Bose distances and dimensions, of narrow-sense BCH codes of length $n$ over $\mathbb{F}_q$.
+They are known only for a few families of lengths.
+For lengths $n=q^m+1$ (antiprimitive BCH codes) see \cite{LLGS,LLFLR,ZC} and the references there.
+
+Liu, Li, Guo and Song \cite{LLGS} studied $n=q^m+1$.
+In their Section~5.2, $q$ is a power of $2$.
+When $m$ is not a power of two they write $m=2^rt+2^{r-1}$ with $r\ge2$ and $t\ge1$, and put
+\[
+\Phi'(x,q)=\frac q2\,\bigl(q^{2^x}-1\bigr)\bigl(q^{2^{x-1}}-1\bigr)\cdots\bigl(q^{2^0}-1\bigr)\quad(x\ge0),\qquad \Phi'(x,q)=\frac q2\quad(x<0),
+\]
+\[
+\delta_1=\frac{n}{q^{2^{r-1}}+1}\,\Phi'(r-2,q),\qquad
+\delta_2=\delta_1-\frac{2\bigl(\delta_1+\Phi'(r-1,q)\bigr)}{q^{2^r}},
+\]
+\[
+\delta_3=\begin{cases}\delta_2-(q-1)q^2, & t=1,\\ \delta_2-2\,\Phi'(r-1,q), & t>1.\end{cases}
+\]
+For $m=2^r\ge4$ they give other formulas for $\delta_1,\delta_2,\delta_3$, and for $m=2$ explicit values.
+They proved that $\delta_1$ is the largest coset leader \cite[Theorem~24]{LLGS} and stated the following conjecture.
+
+\begin{conjecture}[{\cite[Conjecture~25]{LLGS}}]\label{conj}
+Let $q$ be a power of $2$, and let $\delta_2$ and $\delta_3$ be given as above.
+Then $\delta_2$ and $\delta_3$ are the second and third largest coset leaders modulo $n=q^m+1$, respectively.
+\end{conjecture}
+
+The paper \cite{LLGS} is about nonbinary codes, so $q>2$ there.
+However, the remark following Conjecture~\ref{conj} says that its statements also apply to $q=2$, and that for $q=2$ they were verified in \cite{LLFLR} when $m\not\equiv0\pmod 8$.
+
+\section{The counterexample}
+
+\begin{theorem}\label{thm:main}
+Conjecture~\ref{conj} is false.
+For $q=4$ and $m=12=2^3\cdot1+2^2$ (so $r=3$ and $t=1$), and $n=4^{12}+1=16777217$, the conjectured third largest coset leader $\delta_3=5875062$ is not a coset leader.
+\end{theorem}
+
+\begin{proof}
+Here $\Phi'(1,4)=2\cdot15\cdot3=90$ and $\Phi'(2,4)=2\cdot255\cdot15\cdot3=22950$.
+Hence
+\begin{align*}
+\delta_1&=\frac{16777217}{257}\cdot 90=65281\cdot 90=5875290,\\
+\delta_2&=5875290-\frac{2\,(5875290+22950)}{65536}=5875290-180=5875110,
+\end{align*}
+with the division exact, and $\delta_3=\delta_2-3\cdot 16=5875062$.
+But $5875062\cdot 4^6=24064253952=1434\cdot16777217+5724774$.
+So $5724774\in C_{5875062}$ and $5724774<5875062$, and $5875062$ is not the smallest element of its coset.
+\end{proof}
+
+The parameters $q=4>2$, $r=3$, $t=1$ lie in the nonbinary setting of \cite{LLGS}.
+A direct search shows that the three largest coset leaders modulo $4^{12}+1$ are $5875290$, $5875110$ and $5872230$.
+Thus the formulas for $\delta_1$ and $\delta_2$ are correct here, and the third largest leader is $5872230$.
+
+\section{Where the conjecture fails}
+
+We tested the branch $m=2^rt+2^{r-1}$ for $q\in\{2,4,8,16\}$, $r\in\{2,3,4\}$ and $t\in\{1,2,3\}$, which gives $36$ parameter sets.
+For each set we decided whether the conjectured $\delta_1,\delta_2,\delta_3$ are coset leaders.
+This takes at most $2m$ modular multiplications per value, because the order of $q$ modulo $q^m+1$ is $2m$.
+When $n<10^{12}$ (15 parameter sets) we also found the three largest coset leaders, by scanning downwards from $\delta_1$, which is the largest leader by \cite[Theorem~24]{LLGS}.
+When $n<10^8$ we checked independently that $\delta_1$ is the largest leader, by scanning down from $\lfloor n/2\rfloor$.
+This suffices because $q^m\equiv-1\pmod n$, so every coset contains both $x$ and $n-x$.
+The results are as follows.
+\begin{itemize}
+\item $\delta_1$ and $\delta_2$ are coset leaders in all $36$ sets, and $\delta_2$ is the second largest leader in all $15$ sets where the top three were computed.
+\item The conjectured $\delta_3$ is a coset leader in all $28$ sets with $r=2$ or $t\ge2$, and it is the third largest leader in all $11$ of them where the top three were computed.
+\item For $t=1$ and $r\in\{3,4\}$, i.e.\ $m\in\{12,24\}$, the conjectured $\delta_3$ is \emph{not a coset leader} for any $q\in\{2,4,8,16\}$ (8 sets).
+\end{itemize}
+We also tested the branch $m=2^r$ for $m\in\{2,4,8,16\}$ and $q\in\{2,4,8,16\}$.
+The cases $q=2$, $m\le4$ were excluded because the formulas give non-positive values there.
+In all $14$ remaining cases the three conjectured values are coset leaders, and they are the three largest leaders in all $12$ cases with $n<10^{12}$.
+So, as far as we could test, Conjecture~\ref{conj} fails only for $t=1$ and $r\ge3$.
+
+\begin{remark}
+For $q=2$ and $m=12$ the conjectured value is $\delta_3=717-4=713$.
+But $713\cdot2^{9}\equiv423\pmod{4097}$, and Theorem~5.2 of \cite{LLFLR} (the case $t=1$ of $m=8t+4$) gives $\delta_3=\delta_2-24=693$, in agreement with our computation.
+Hence, for $t=1$, the statement in \cite{LLGS} that the conjectures were verified in \cite{LLFLR} for $q=2$ and $m\not\equiv0\pmod 8$ is inaccurate.
+The same family $m=3\cdot 2^{v}$ is the one in which Zhang and Cao \cite[Remark~1]{ZC} found that the formula for $\delta_4$ in the companion Conjecture~20 of \cite{LLGS} (odd $q$) must be corrected.
+\end{remark}
+
+For $t=1$ the data suggest the following correction.
+For $r=2$ it reduces to the conjectured $\delta_2-(q-1)q^2$, and for $q=2$, $r=3$ it gives $\delta_2-24$, as in \cite[Theorem~5.2]{LLFLR}.
+
+\begin{conjecture}\label{conj:fix}
+Let $q$ be a power of $2$, $r\ge 2$ and $m=2^r+2^{r-1}$.
+Then the third largest coset leader modulo $q^m+1$ is
+\[
+\delta_2-(q-1)\,q^{2^{r-2}+1}\prod_{j=1}^{r-2}\bigl(q^{2^j}-1\bigr).
+\]
+\end{conjecture}
+
+We verified Conjecture~\ref{conj:fix} for $q\in\{2,4,8,16\}$ with $r\in\{2,3\}$, and for $(q,r)=(2,4)$, $(4,4)$ and $(2,5)$.
+In each of these cases an exhaustive search shows that no coset leader lies strictly between $\delta_2$ and $\delta_1$, so that $\delta_2$ is the second largest leader, and that the largest leader below $\delta_2$ is the predicted value.
+For $(q,r)=(8,4)$ the predicted value is a coset leader, but the range to be searched (about $5.9\cdot10^{10}$ values) was too large.
+
+All computations use exact integer arithmetic and are made by a self-contained Python script, \texttt{conj25\_check.py}, which accompanies the source files together with its output.
+The whole run takes about half a minute on one core.
+
+\section{Formal verification}
+
+The conjecture and the counterexample were formalized in Lean~4 (version 4.33.1) with Mathlib.
+The coset leader property is stated as
+\begin{Verbatim}[fontsize=\small,frame=single]
+def IsCosetLeader (q n x : ℕ) : Prop :=
+  x < n ∧ ∀ i : ℕ, x ≤ (x * q ^ i) % n
+\end{Verbatim}
+For the moduli considered here this is equivalent to minimality in the coset, since $\gcd(q,n)=1$.
+The functions $\Phi'$, $\delta_1$, $\delta_2$ and $\delta_3$ are transcribed from \cite[Sect.~5.2]{LLGS}, and ``$x$ is the $k$-th largest leader'' is formalized as ``$x$ is a leader and exactly $k-1$ leaders are larger than $x$''.
+We prove two theorems.
+The first is the negation of the branch $m=2^rt+2^{r-1}$ of Conjecture~\ref{conj}, quantified over all powers of two $q$ and all $r\ge2$, $t\ge1$; the full conjecture implies this branch.
+The second is the explicit statement of Theorem~\ref{thm:main}.
+Both depend only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+The computations of Section~3 are not formalized.
+
+\subsection*{Author contributions}
+A Claude Opus~5.5 agent surveying open problems in coding theory found the counterexample.
+GPT-6-Astra checked it against the exact statement and conventions of \cite{LLGS}, checked the status of the conjecture, formalized it and wrote the Lean proof of its negation.
+Claude Opus~5.5 checked the transcription of the formulas, carried out the computations of Section~3, found the discrepancy with \cite{LLFLR}, proposed Conjecture~\ref{conj:fix}, added the explicit Lean theorem and wrote the manuscript.
+A human operator initiated the project and provided computing resources; the mathematics, the formal proofs and the text were produced by the models.
+
+\begin{thebibliography}{9}
+
+\bibitem{LLFLR}
+Y.~Liu, R.~Li, Q.~Fu, L.~Lu and Y.~Rao,
+\emph{Some binary BCH codes with length $n=2^m+1$},
+Finite Fields Appl. \textbf{55} (2019), 109--133; arXiv:1803.02731.
+
+\bibitem{LLGS}
+Y.~Liu, R.~Li, L.~Guo and H.~Song,
+\emph{Dimensions of nonbinary antiprimitive BCH codes and some conjectures},
+Discrete Math. \textbf{346} (2023), no.~9, 113496; arXiv:1712.06842.
+
+\bibitem{ZC}
+H.~Zhang and X.~Cao,
+\emph{Dimensions of some LCD BCH codes},
+arXiv:2305.06508 (2023).
+
+\end{thebibliography}
+
+\end{document}

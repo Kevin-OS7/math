@@ -21,3 +21,15 @@ Every line should read `[propext, Classical.choice, Quot.sound]`. -/
 #print axioms DickeyRosenberg.ustar_iso_canonical
 #print axioms DickeyRosenberg.conjecture14i_paper
 #print axioms DickeyRosenberg.conjecture14ii_paper
+#print axioms Forcing.problem55
+#print axioms CosetB.conjecture25_false
+#print axioms CosetB.counterexample_q4_m12
+#print axioms DedePopat.not_conjecture1
+#print axioms DedePopat.not_conjecture1NonEquienergetic
+#print axioms DedePopat.rook_clebschCompl_counterexample
+#print axioms DedePopat.order10_counterexample
+#print axioms DedePopat.not_conjecture1_order10
+#print axioms DedePopat.not_corollary2
+#print axioms DepthVariance.explicit_counterexample
+#print axioms DepthVariance.minimum_variance_depth_unique_false
+#print axioms CosetA.conjecturesA

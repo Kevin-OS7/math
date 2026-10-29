@@ -24,6 +24,31 @@ sources:
     id: ../preprints/Maximally-probable-labeled-topologies-with-simultaneity-October-29-2026/paper.pdf
     type: article
 
+  - title: "The minimum and maximum forcing numbers of bipartite graphs: an answer to a question of Liu, Diwan and Zhang"
+    authors: ["GPT-6-Astra", "Claude Fable 5.1", "Claude Opus 5.5"]
+    id: ../preprints/The-minimum-and-maximum-forcing-numbers-of-bipartite-graphs-October-29-2026/paper.pdf
+    type: article
+
+  - title: "Minimum-variance phylogenetic trees are not unique up to depth-equivalence"
+    authors: ["GPT-6-Astra", "Claude Fable 5.1", "Claude Opus 5.5"]
+    id: ../preprints/Minimum-variance-phylogenetic-trees-are-not-unique-up-to-depth-equivalence-October-29-2026/paper.pdf
+    type: article
+
+  - title: "Connected locally equienergetic graphs: counterexamples to a conjecture of Dede and Popat"
+    authors: ["GPT-6-Astra", "Claude Fable 5.1", "Claude Opus 5.5"]
+    id: ../preprints/Connected-locally-equienergetic-graphs-October-29-2026/paper.pdf
+    type: article
+
+  - title: "The two largest coset leaders modulo (q+1)(q^m±1): a proof of two conjectures of Liu, Wu and Zhu"
+    authors: ["GPT-6-Astra", "Claude Fable 5.1", "Claude Opus 5.5"]
+    id: ../preprints/A-proof-of-two-conjectures-of-Liu-Wu-and-Zhu-on-coset-leaders-October-29-2026/paper.pdf
+    type: article
+
+  - title: "The third largest coset leader modulo q^m+1: a counterexample to a conjecture of Liu, Li, Guo and Song"
+    authors: ["GPT-6-Astra", "Claude Opus 5.5"]
+    id: ../preprints/A-counterexample-to-a-conjecture-of-Liu-Li-Guo-and-Song-on-coset-leaders-October-29-2026/paper.pdf
+    type: article
+
 related_formalizations:
   - id: https://github.com/leanprover-community/mathlib4
     relationship: builds-on
@@ -72,6 +97,38 @@ status:
     - declaration: DickeyRosenberg.conjecture14ii_paper
       file: KOS/Phylogenetics/LabeledHistories/Main.lean
 
+    - comparator_config: ComparatorChallenges/ForcingNumbers.json
+      declaration: Forcing.problem55
+      file: KOS/GraphTheory/ForcingNumbers/Main.lean
+
+    - comparator_config: ComparatorChallenges/DepthVariance.json
+      declaration: DepthVariance.minimum_variance_depth_unique_false
+      file: KOS/Phylogenetics/DepthVariance/Main.lean
+
+    - declaration: DepthVariance.explicit_counterexample
+      file: KOS/Phylogenetics/DepthVariance/Main.lean
+
+    - comparator_config: ComparatorChallenges/LocalEnergy.json
+      declaration: DedePopat.not_conjecture1
+      file: KOS/ChemicalGraphTheory/LocalEnergy/Main.lean
+
+    - declaration: DedePopat.not_conjecture1NonEquienergetic
+      file: KOS/ChemicalGraphTheory/LocalEnergy/Main.lean
+
+    - declaration: DedePopat.not_corollary2
+      file: KOS/ChemicalGraphTheory/LocalEnergy/Main.lean
+
+    - comparator_config: ComparatorChallenges/TwoLargestCosetLeaders.json
+      declaration: CosetA.conjecturesA
+      file: KOS/CodingTheory/TwoLargestCosetLeaders/Main.lean
+
+    - comparator_config: ComparatorChallenges/ThirdLargestCosetLeader.json
+      declaration: CosetB.conjecture25_false
+      file: KOS/CodingTheory/ThirdLargestCosetLeader/Main.lean
+
+    - declaration: CosetB.counterexample_q4_m12
+      file: KOS/CodingTheory/ThirdLargestCosetLeader/Main.lean
+
 automation:
   methods:
     - method: agent
@@ -81,5 +138,6 @@ review:
 
 acknowledgements: >-
   Thank you very much to the authors of Lean 4, Mathlib, google-deepmind/formal-conjectures,
-  Lake, Comparator, lean4export, landrun and nanoda,
-  and to Disanto, Dickey and Rosenberg and to the OEIS contributors for posing the questions.
+  Lake, Comparator, lean4export, landrun and nanoda, and to the authors who posed the questions:
+  Disanto, Dickey and Rosenberg; the OEIS contributors; Liu, Diwan and Zhang;
+  Coronado, Mir, Rosselló and Rotger; Dede and Popat; Liu, Wu and Zhu; and Liu, Li, Guo and Song.

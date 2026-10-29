@@ -8,7 +8,7 @@
 \date{October 29, 2026}
 \begin{document}
 \begin{abstract}
-This collection contains three manuscripts, each resolving a published open question.
+This collection contains eight manuscripts, each resolving a published open question; four prove a conjecture or answer a question affirmatively, and four refute a conjecture.
 All main results are formally verified in Lean~4 with Mathlib.
 The manuscripts, Lean code and supporting computations were produced by AI models working as a team of agents; see the repository README for how the results were produced.
 \end{abstract}
@@ -44,5 +44,49 @@ Dickey and Rosenberg (Discrete Appl.\ Math.\ 2026) allowed several branching eve
 The manuscript proves the conjecture in a stronger, coefficientwise form: for every bound $m$, the generating polynomial $\sum_f\prod_v x_{f(v)}$ of strict labelings of the internal vertices by $\{1,\dots,m\}$ is maximized coefficientwise by $U^*_n$.
 The key tool is a switching injection comparing labelings of two trees with labelings of their union and intersection, with different label bounds on the two sides, used in an induction along the dyadic structure of $U^*_n$.
 \emph{Formalization:} both parts of the conjecture including uniqueness, with the paper's recursive definition of $U^*_n$.
+
+\section*{004. The minimum and maximum forcing numbers of bipartite graphs}
+\emph{Discipline: graph theory; mathematical chemistry (Kekul\'e structures).}
+
+The forcing number of a perfect matching $M$ is the smallest number of edges of $M$ that belong to no other perfect matching; in chemistry it is the ``innate degree of freedom'' of a Kekul\'e structure.
+Liu, Diwan and Zhang (arXiv 2025, Problem~5.5) asked whether every bipartite graph of order $2n$ whose maximum forcing number satisfies $F(G)\ge n-k$ has minimum forcing number $f(G)\ge\lceil n/k\rceil-1$, and proved this for $k\le2$.
+The manuscript answers the question affirmatively for all $k$, in the equivalent form $n\le(f(G)+1)(n-F(G))$, which is sharp.
+The key tools are the triangular structure of bipartite graphs with a unique perfect matching, an interval representation of a perfect matching, and the greedy algorithm for interval scheduling.
+\emph{Formalization:} the statement of Problem~5.5 for all finite bipartite graphs with a perfect matching.
+
+\section*{005. Minimum-variance phylogenetic trees are not unique}
+\emph{Discipline: mathematical biology (phylogenetics, tree balance).}
+
+Coronado, Mir, Rossell\'o and Rotger (BMC Bioinformatics 2020) studied the variance $V$ of the leaf depths of a rooted bifurcating tree as a balance index and conjectured that, for every $n$, the trees with $n$ leaves of minimum $V$ all have the same multiset of leaf depths; they had checked this for $n\le2^{20}$.
+The manuscript disproves the conjecture: for $n=67{,}256{,}579$ two trees with different leaf-depth multisets both attain the minimum $n^2V=330{,}431{,}494{,}786$.
+Global minimality is proved by cutting a tree at a level, relaxing to an integer ``coin'' problem with a rigid normal form, and a finite certificate of $16{,}800$ exact evaluations.
+Using the structure theorem of Coronado et al., an exact search shows that this is the smallest counterexample, and that there are exactly six counterexamples up to $2^{28}$.
+\emph{Formalization:} the negation of the conjecture, with the two trees and their global minimality among all trees.
+
+\section*{006. Connected locally equienergetic graphs}
+\emph{Discipline: mathematical chemistry (graph energy); spectral graph theory.}
+
+The local energy of a graph is the sum over its vertices of the decrease of the energy (the sum of the absolute values of the adjacency eigenvalues) when the vertex is deleted.
+Dede and Popat (MATCH Commun.\ Math.\ Comput.\ Chem.\ 2025) stated, on the basis of a computer search, that up to order $10$ the only connected pairs with equal local energy are $(K_n,C_n)$ for odd $n$, and conjectured this for all orders.
+The manuscript shows that both statements are false: there are exactly $58$ further pairs of order $10$, all with the same eigenvalues and angles and related by Godsil--McKay switching; and at order $16$ the rook's graph, the Shrikhande graph and the complement of the Clebsch graph all have local energy $64$, although the last one has a different energy.
+Cospectral walk-regular graphs and strongly regular graphs with a sign condition give infinite families of counterexamples.
+\emph{Formalization:} the refutations by the pairs of orders $16$ and $10$, including a pair with different energies.
+
+\section*{007. The two largest coset leaders modulo $(q+1)(q^m\pm1)$}
+\emph{Discipline: coding theory (BCH codes); elementary number theory.}
+
+The largest $q$-cyclotomic coset leaders modulo $n$ give the largest designed distances of BCH codes of length $n$.
+Liu, Wu and Zhu (arXiv 2026) conjectured, from computations, formulas for the two largest coset leaders modulo $(q+1)(q^m+1)$ and $(q+1)(q^m-1)$ for odd $m$.
+The manuscript proves both for all odd $m\ge3$ (they fail for $m=1$), the first for every odd $q\ge3$ and the second for every $q\ge2$.
+The key tool is a translation of cosets into orbits of signed or binary digit words under rotation, together with a classification of the words of small maximal rotation.
+\emph{Formalization:} both conjectures for prime powers $q$ and odd $m\ge3$.
+
+\section*{008. The third largest coset leader modulo $q^m+1$}
+\emph{Discipline: coding theory (antiprimitive BCH codes).}
+
+Liu, Li, Guo and Song (Discrete Math.\ 2023, Conjecture~25) conjectured formulas for the second and third largest coset leaders modulo $q^m+1$ for $q$ a power of $2$.
+The manuscript shows that the formula for the third largest leader is false: for $q=4$ and $m=12$ the conjectured value is not even a coset leader.
+Computations locate the failures in the family $m=3\cdot2^{r-1}\ge12$ and suggest a corrected formula, which agrees with a theorem of Liu, Li, Fu, Lu and Rao for $q=2$, $m=12$.
+\emph{Formalization:} the negation of the conjecture and the explicit counterexample.
 
 \end{document}

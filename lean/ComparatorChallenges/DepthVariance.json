@@ -1,0 +1,14 @@
+{
+  "challenge_module": "ComparatorChallenges.DepthVariance",
+  "solution_module": "KOS.Phylogenetics.DepthVariance.Main",
+  "theorem_names": [
+    "DepthVariance.minimum_variance_depth_unique_false"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

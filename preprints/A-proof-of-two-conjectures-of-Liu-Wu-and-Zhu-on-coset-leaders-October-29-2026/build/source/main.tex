@@ -1,0 +1,327 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[no-math]{fontspec}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.82]
+\usepackage[margin=1.1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyvrb}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title[The two largest coset leaders modulo $(q+1)(q^m\pm1)$]{The two largest coset leaders modulo $(q+1)(q^m\pm1)$:\\ a proof of two conjectures of Liu, Wu and Zhu}
+
+\author{GPT-6-Astra}
+\author{Claude Fable 5.1}
+\author{Claude Opus 5.5}
+\thanks{The authors are AI models: GPT-6-Astra (OpenAI) and Claude Fable~5.1 and Claude Opus~5.5 (Anthropic). Source files, scripts and Lean code: \url{https://github.com/Kevin-OS7/math}.}
+
+\date{October 29, 2026}
+
+\begin{document}
+
+\begin{abstract}
+The largest $q$-cyclotomic coset leaders modulo $n$ determine the largest designed distances of BCH codes of length $n$ over $\mathbb{F}_q$.
+Liu, Wu and Zhu (arXiv 2026) studied BCH codes of length $\lambda(q^m+1)$ with $\lambda\mid q-1$.
+For the lengths $(q+1)(q^m+1)$ and $(q+1)(q^m-1)$, which their methods do not cover, they conjectured explicit formulas for the two largest coset leaders when $m$ is odd, on the basis of computations.
+We prove both conjectures for all odd $m\ge3$.
+For the length $(q+1)(q^m+1)$ the formulas hold for every odd $q\ge3$, and for $(q+1)(q^m-1)$ for every $q\ge2$; in particular, for every odd prime power, respectively every prime power, $q$.
+For $m=1$ the formulas fail.
+The proofs translate cosets into orbits of signed or binary digit words under rotation and classify the words with small maximal rotation.
+Both results are formalized and checked in Lean~4.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Let $q\ge2$ and let $n$ be a positive integer coprime to $q$.
+The $q$-cyclotomic coset of $x$ modulo $n$ is $C_x=\{xq^i\bmod n: i\ge0\}$, where $y\bmod n$ denotes the residue in $\{0,\dots,n-1\}$, and the smallest element of a coset is its \emph{coset leader}.
+We write $\delta_1>\delta_2$ for the two largest coset leaders modulo $n$.
+When $q$ is a prime power, $\delta_1$ and $\delta_2$ determine the largest designed distances, the Bose distances and the dimensions of the corresponding narrow-sense BCH codes of length $n$ over $\mathbb{F}_q$; they are known only for a few families of lengths \cite{LWZ,LLGS}.
+
+Liu, Wu and Zhu \cite{LWZ} studied BCH and LCD cyclic codes of length $\lambda(q^m+1)$ with $\lambda\mid q-1$.
+Their method relies on the condition $\lambda\mid q-1$ and does not apply to the moduli $(q+1)(q^m\pm1)$.
+In their concluding remarks they state, ``based on extensive computational evidence'', the following conjectures.
+
+\begin{conjecture}[{\cite[Sect.~6]{LWZ}}]\label{conj}
+\begin{enumerate}
+\item Let $n=(q+1)(q^m+1)$, where $m$ is odd. Then
+\[
+\delta_1=\begin{cases}\dfrac{3(q+1)(q^m+1)}{4},& q\equiv1\pmod 4,\\[2mm] \dfrac{(3q+1)(q^m+1)}{4},& q\equiv3\pmod4,\end{cases}
+\]
+and
+\[
+\delta_2=\begin{cases}\dfrac{(3q-1)(q^m+1)}{4},& q\equiv1\pmod 4,\\[2mm] \dfrac{(3q^2+q-4)q^{m-1}-(q-1)}{4},& q\equiv3\pmod4.\end{cases}
+\]
+\item Let $n=(q+1)(q^m-1)$, where $m$ is odd. Then $\delta_1=q^{m+1}-q^{m-1}-q-1$ and
+\[
+\delta_2=\begin{cases}(q^2-1)q^2-(2q+1),& m=3,\\ (q^2-1)q^{m-1}-(q+1)\bigl(q^{(m-1)/2}+1\bigr),& m>3.\end{cases}
+\]
+\end{enumerate}
+\end{conjecture}
+
+Here $q$ is a prime power, odd in part~(1).
+Part~(2) gives no formula for $\delta_2$ when $m=1$, and for $m=1$ the formulas are in fact false: for $q=3$ the two largest leaders modulo $(q+1)(q+1)=16$ are $10$ and $8$, not $10$ and $6$, and the largest leader modulo $(q+1)(q-1)=8$ is $5$, not $4$.
+We prove the conjectures for all odd $m\ge3$.
+
+\begin{theorem}\label{thm:plus}
+Let $q\ge3$ be odd, let $m\ge3$ be odd and $n=(q+1)(q^m+1)$.
+Then the two largest coset leaders modulo $n$ are given by part~(1) of Conjecture~\ref{conj}.
+\end{theorem}
+
+\begin{theorem}\label{thm:minus}
+Let $q\ge2$, let $m\ge3$ be odd and $n=(q+1)(q^m-1)$.
+Then the two largest coset leaders modulo $n$ are given by part~(2) of Conjecture~\ref{conj}.
+\end{theorem}
+
+Both theorems are formalized in Lean~4 (Section~\ref{sec:lean}); the formal statement is the conjecture for prime powers $q$ and odd $m\ge3$, with the coset leaders defined from scratch.
+
+\section{The length $(q+1)(q^m+1)$}\label{sec:plus}
+
+Throughout this section $q\ge3$ and $m\ge3$ are odd, and
+\[
+N=q^m+1,\qquad n=(q+1)N,\qquad h=\frac{q+1}2,\qquad S=\frac N{q+1}=q^{m-1}-q^{m-2}+\dots-q+1 .
+\]
+Note that $N$ is even and $S$ is odd.
+
+\subsection{Leaders above $n/2$}
+
+\begin{lemma}\label{lem:reduction}
+Let $a>n/2$ be a coset leader modulo $n$.
+Then $h\mid a$, and the residues $y_i=(a/h)q^i\bmod 2N$ satisfy $y_i=N+z_i$ with
+\[
+0<z_i<N,\qquad z_i\ \text{odd},\qquad z_{i+1}\equiv qz_i\pmod{2N},\qquad z_{i+m}=N-z_i .
+\]
+\end{lemma}
+
+\begin{proof}
+Since $q+1$ divides $N$, $n$ divides $N^2$, so $q^{2m}=(N-1)^2\equiv1-2N\pmod n$ and $q^{2mk}\equiv1-2kN\pmod n$.
+Hence $C_a$ contains the residues of $a-2kNa$ for all $k\ge0$, among them the residue of $a$ modulo $g=\gcd(2Na,n)=N\gcd(2a,q+1)$, which is smaller than $g$.
+If $g<n$ then $g\le n/2<a$, contradicting the minimality of $a$.
+So $g=n$, that is, $q+1\mid 2a$ and $h\mid a$.
+Write $a=hy$.
+Since $n=2hN$, the map $x\mapsto x/h$ identifies $C_a$ with the coset of $y$ modulo $2N$, and all its elements exceed $N$ because all elements of $C_a$ exceed $n/2$.
+If $y$ were even, then $yq^m=y(N-1)\equiv 2N-y\pmod{2N}$ would be smaller than $N$; so $y$ is odd, and since $N$ is even all $z_i$ are odd.
+As $q$ is odd, $qN\equiv N\pmod{2N}$, which gives the recurrence.
+Finally $(N-1)z_i\equiv N-z_i\pmod{2N}$ because $z_i$ is odd.
+\end{proof}
+
+Put $w_i=z_i-N/2$ and $R=\max_i|w_i|$, the \emph{radius} of the coset.
+Since $w_{i+m}=-w_i$, the smallest $z_i$ is $N/2-R$, and therefore
+\begin{equation}\label{eq:leader}
+a=h\Bigl(\frac{3N}2-R\Bigr).
+\end{equation}
+Conversely, a sequence $(z_i)$ with the properties of Lemma~\ref{lem:reduction} defines the coset of $h(N+z_0)$, whose leader is given by \eqref{eq:leader}.
+So the leaders above $n/2$ correspond to such sequences, and larger leaders have smaller radii.
+
+\subsection{The case $q\equiv1\pmod4$}
+
+Then $N\equiv2\pmod4$, so $N/2$ is odd and the $w_i$ are even; write $w_i=2v_i$.
+Since $4\mid q-1$, we have $qN/2\equiv N/2\pmod{2N}$, so $v_{i+1}\equiv qv_i\pmod N$.
+Let $M=\max_i|v_i|$, so $R=2M$.
+If $0<M$ and $(q+1)M<N$, choose $i$ with $|v_i|=M$; then $qv_i-v_{i+1}$ is a multiple of $N$ of absolute value at most $(q+1)M<N$, hence zero, and $|v_{i+1}|=qM>M$, a contradiction.
+So $M=0$ or $M\ge S$.
+
+The sequence $v_i=0$ gives $a=3hN/2=3n/4$, a fixed point of multiplication by $q$.
+The sequence $v_i=(-1)^iS$ satisfies the recurrence because $qS=N-S$, and $z_i=N/2\pm2S$ lies in $(0,N)$ because $4S<N$ for $q\ge5$.
+By \eqref{eq:leader} its leader is $3n/4-(q+1)S=(3q-1)N/4$, which exceeds $n/2$.
+Every other leader above $n/2$ has $M\ge S$ and is therefore at most $(3q-1)N/4$.
+This proves Theorem~\ref{thm:plus} for $q\equiv1\pmod4$.
+
+\subsection{The case $q\equiv3\pmod4$}
+
+Now $4\mid N$, so $N/2$ is even and all $w_i$ are odd, in particular non-zero.
+From $z_{i+1}\equiv qz_i$ and $(q-1)/2$ odd we get
+\begin{equation}\label{eq:rec3}
+qw_i-w_{i+1}\equiv N\pmod{2N}.
+\end{equation}
+The left-hand side is a non-zero multiple of $N$, so $(q+1)R\ge N$ and $R\ge S$.
+The sequence $w_i=(-1)^iS$ attains this bound: it is antiperiodic with period $m$, it satisfies \eqref{eq:rec3} since $qS+S=N$, and $z_i=N/2\pm S$ is odd and lies in $(0,N)$.
+By \eqref{eq:leader},
+\[
+\delta_1=h\Bigl(\frac{3N}2-S\Bigr)=\frac{(3q+1)N}{4}.
+\]
+
+For the second leader we use signed digit words.
+A word $s=(s_0,\dots,s_{m-1})\in\{\pm1\}^m$ represents the integer $\langle s\rangle=\sum_{j=0}^{m-1}s_jq^{m-1-j}$.
+Two words compare like their integers lexicographically, because $2q^k>2\sum_{j<k}q^j$.
+Let
+\[
+W=(+,+,-,+,-,+,\dots,-,+,+)
+\]
+be the word whose first and last letters are $+$ and whose letters in positions $1,\dots,m-2$ alternate, starting with $+$; for $m=3$, $W=(+,+,+)$.
+Multiplying by $q+1$ shows that
+\[
+P=\langle W\rangle=\frac{N+2(q^{m-1}+q)}{q+1}.
+\]
+One checks that $S<P<N/2$ and $(q+1)P<2N$, using $q\ge3$ and $m\ge3$.
+
+\begin{lemma}\label{lem:signs}
+Let $a\ge h(3N/2-P)$ be a coset leader, with radius $R\le P$.
+Put $s_i=\operatorname{sign}(w_i)$.
+Then $w_{i+1}=qw_i-Ns_i$, $s_{i+m}=-s_i$, and $w_i=\langle s_i,s_{i+1},\dots,s_{i+m-1}\rangle$ for all $i$.
+\end{lemma}
+
+\begin{proof}
+By \eqref{eq:rec3}, $qw_i-w_{i+1}$ is an odd multiple of $N$ of absolute value at most $(q+1)P<2N$, so it equals $\pm N$.
+If its sign were opposite to that of $w_i$, then $|w_{i+1}|=q|w_i|+N>N/2>P$.
+Iterating the recurrence $m$ times and using $w_{i+m}=-w_i$ and $q^m+1=N$ gives $Nw_i=N\langle s_i,\dots,s_{i+m-1}\rangle$.
+\end{proof}
+
+So the radius of such a coset is the largest value of the length-$m$ windows of an \emph{antiperiodic} sign sequence ($s_{i+m}=-s_i$).
+
+\begin{lemma}[Word lemma]\label{lem:word}
+Let $(s_i)$ be an antiperiodic sign sequence with odd period $m$.
+Either $(s_i)$ alternates, or some window of length $m$ is lexicographically at least $W$.
+Moreover, the largest window of the antiperiodic extension of $W$ is $W$ itself.
+\end{lemma}
+
+\begin{proof}
+Call $i$ a \emph{defect} if $s_i=s_{i+1}$.
+Defects are periodic modulo $m$, and their number $D$ per period is even: among the $m$ consecutive transitions $s_i\to s_{i+1}$ in a period, exactly $m-D$ change the sign, and since $s_{i+m}=-s_i$ the total number of sign changes is odd, so $m-D$ is odd.
+If $D=0$ the sequence alternates.
+Otherwise $D\ge2$, and the gaps between cyclically consecutive defects are positive integers with sum $m$.
+As $m$ is odd, some gap $d$ is odd, and since the other gaps have a positive even sum, $d\le m-2$.
+Start a window at the defect preceding this gap, replacing $i$ by $i+m$ if necessary so that $s_i=s_{i+1}=+$.
+Up to the next defect the window reads $+,+,-,+,-,\dots$; since $d$ is odd, the next defect is a pair $+,+$.
+If $d<m-2$, the window agrees with $W$ in positions $0,\dots,d$ and has $+$ in position $d+1$, where $W$ has $-$; so it exceeds $W$.
+If $d=m-2$, the window equals $W$.
+
+The word $W$ has exactly two defects per period, separated by gaps $m-2$ and $2$.
+A window with positive first letter that does not start at a defect begins with $+,-$ and is smaller than $W$.
+The window starting at one defect is $W$, and the window starting at the other begins with $+,+,-,-$ (or is $(+,+,-)$ if $m=3$), which is smaller than $W$.
+Windows with negative first letter are negative.
+\end{proof}
+
+Now let $a\ge h(3N/2-P)$ be a leader.
+By Lemmas~\ref{lem:signs} and~\ref{lem:word}, either $(s_i)$ alternates, so $w_i=\pm S$ and $a=\delta_1$, or the radius is at least $P$, so $R=P$ and $a=h(3N/2-P)$.
+Conversely, extend $W$ antiperiodically and define $w_i$ by the windows as in Lemma~\ref{lem:signs}.
+Then $\operatorname{sign}(w_i)$ is the first letter of the $i$-th window, so $w_{i+1}=qw_i-Ns_i$; all $w_i$ are odd, and since $(q-1)/2$ is odd, $z_i=N/2+w_i$ satisfies $z_{i+1}\equiv qz_i\pmod{2N}$.
+By Lemma~\ref{lem:word} the radius is $P$, and $P<N/2$ gives $0<z_i<N$.
+So $h(3N/2-P)$ is a coset leader, and
+\[
+\delta_2=h\Bigl(\frac{3N}2-P\Bigr)=\frac{(3q+1)N}4-(q^{m-1}+q)=\frac{(3q^2+q-4)q^{m-1}-(q-1)}4 .
+\]
+This proves Theorem~\ref{thm:plus}.
+
+\section{The length $(q+1)(q^m-1)$}\label{sec:minus}
+
+Throughout this section $q\ge2$ and $m\ge3$ is odd, and
+\[
+Q=q^m,\qquad n=(q+1)(Q-1),\qquad S=\frac{Q+1}{q+1},\qquad T=q^{2m}-1=Sn .
+\]
+For $0<x<n$ put $D(x)=S(n-x)\in(0,T)$.
+Since $S(q^ix\bmod n)=q^iSx\bmod T$, the values $D(x_i)$ over the coset of $x$ form the orbit of $D(x)$ under multiplication by $q$ modulo $T$, and the leader of the coset is $n-\max_i D(x_i)/S$.
+Write each residue modulo $T$ as a word of $2m$ digits in base $q$; multiplication by $q$ modulo $T$ rotates the word cyclically.
+Hence the cosets of non-zero residues correspond to the rotation classes of non-zero words of length $2m$ whose value is divisible by $S$, and maximizing the leader means minimizing the largest rotation of the word.
+
+\subsection{Sparse words}
+
+Suppose that all digits of such a word are $0$ or $1$.
+Write a rotation as $D_i=QA_i+B_i$ with blocks $A_i,B_i$ of $m$ digits, and let $a_i,b_i$ be the leading digits of $A_i,B_i$.
+Since $Q\equiv-1\pmod S$, the number $z_i=(A_i-B_i)/S$ is an integer, and rotating by one position gives
+\begin{equation}\label{eq:zrec}
+z_{i+1}=qz_i-(q+1)(a_i-b_i),\qquad |z_i|\le\frac{Q-1}{(q-1)S}<\frac{q+1}{q-1}.
+\end{equation}
+If some $z_i=0$, then \eqref{eq:zrec} forces $a_i=b_i$ and $z_{i+1}=0$, so all $z_i$ vanish and the word consists of two equal halves (it is \emph{$m$-periodic}).
+For $q\ge3$ the bound gives $z_i\in\{-1,0,1\}$; if $z_i=\pm1$ then \eqref{eq:zrec} forces $a_i-b_i=z_i$ and $z_{i+1}=-z_i$, so the digits alternate $1,0,1,0,\dots$ around the circle.
+
+\begin{lemma}\label{lem:sparse}
+Let $q\ge3$.
+A word of length $2m$ with digits in $\{0,1\}$ whose value is divisible by $S$ is $m$-periodic or alternating.
+For $q=2$ the same holds for words in which any two cyclically consecutive $1$s are at distance at least $3$; such words are $m$-periodic.
+\end{lemma}
+
+\begin{proof}
+The case $q\ge3$ was shown above.
+For $q=2$ the bound allows $|z_i|\le2$.
+If $z_i=2$ (after exchanging the halves if necessary), \eqref{eq:zrec} forces $(a_i,b_i)=(1,0)$ and $z_{i+1}=1$; the spacing condition forces $a_{i+1}=0$, then $z_{i+2}=2+3b_{i+1}\le2$ forces $b_{i+1}=0$ and $z_{i+2}=2$, and the following pair is again $(1,0)$, which violates the spacing.
+If $z_i=\pm1$, then, since $|z_{i+1}|=2$ is excluded, \eqref{eq:zrec} forces $a_i-b_i=z_i$ and $z_{i+1}=-z_i$; repeating this, the pairs alternate $(1,0),(0,1),(1,0),\dots$, which again violates the spacing.
+So all $z_i$ vanish.
+\end{proof}
+
+\subsection{Extremal periodic words}
+
+An $m$-periodic word has value $(Q+1)E$, where $E$ is its block of $m$ digits, and its largest rotation is $Q+1$ times the largest rotation of $E$.
+Among non-zero binary words $E$ of length $m$, the smallest possible largest rotation is $q^{m-1}$, attained by a single $1$.
+A word with at least two $1$s has two cyclically consecutive $1$s at distance at most $(m-1)/2$, and the rotation starting at the first of them is at least $q^{m-1}+q^{(m-1)/2}$; equality holds for two $1$s at distances $(m-1)/2$ and $(m+1)/2$.
+Hence the two smallest values of the largest rotation of $m$-periodic binary words are
+\begin{equation}\label{eq:M}
+M_1=(Q+1)q^{m-1},\qquad M_2=(Q+1)\bigl(q^{m-1}+q^{(m-1)/2}\bigr),
+\end{equation}
+and both are values of words divisible by $S$, since $Q+1=(q+1)S$.
+
+\subsection{Proof of Theorem~\ref{thm:minus}}
+
+\emph{The case $m\ge5$.}
+The words of \eqref{eq:M} give two cosets with leaders $n-M_1/S$ and $n-M_2/S$, both positive.
+A coset with a larger leader than $n-M_2/S$ comes from a word all of whose rotations are at most $M_2<2q^{2m-1}$; so all digits are $0$ or $1$.
+For $q\ge3$, Lemma~\ref{lem:sparse} leaves $m$-periodic and alternating words.
+An alternating word has largest rotation $M_{\mathrm{alt}}=q^{2m-1}+q^{2m-3}+\dots+q$.
+For $m>5$ this exceeds $M_2$ at the second non-zero digit, since $2m-3>(3m-1)/2$; for $m=5$ the first two non-zero digits agree, and the third non-zero digit of $M_{\mathrm{alt}}$ is at position $5$, above position $4$ of the third non-zero digit of $M_2$.
+For $q=2$ and $m\ge7$, two cyclically consecutive $1$s at distance less than $(m-1)/2$ would give a rotation exceeding $M_2$ at its second non-zero digit, so all distances are at least $(m-1)/2\ge3$ and Lemma~\ref{lem:sparse} applies.
+In all these cases only $m$-periodic words compete, and \eqref{eq:M} shows that the two largest leaders are
+\[
+\delta_1=n-\frac{M_1}S=q^{m+1}-q^{m-1}-q-1,\qquad \delta_2=n-\frac{M_2}S=(q^2-1)q^{m-1}-(q+1)\bigl(q^{(m-1)/2}+1\bigr).
+\]
+The remaining case $q=2$, $m=5$, that is $n=93$, is checked directly: the two largest leaders modulo $93$ are $45$ and $33$, as the formulas predict.
+
+\emph{The case $m=3$.}
+For $q\ge3$ the alternating word has $M_{\mathrm{alt}}=q^5+q^3+q=S(q^3+q^2+q)$, and $(q^3+1)q^2<M_{\mathrm{alt}}<(q^3+1)(q^2+q)$.
+A coset with largest rotation at most $M_{\mathrm{alt}}$ comes from a binary word, so by Lemma~\ref{lem:sparse} and \eqref{eq:M} the single-$1$ periodic word comes first and the alternating word second.
+This gives $\delta_1=q^4-q^2-q-1$ and $\delta_2=q^4-q^2-2q-1=(q^2-1)q^2-(2q+1)$.
+For $q=2$ the cosets modulo $21$ are $\{0\}$, $\{1,2,4,8,16,11\}$, $\{3,6,12\}$, $\{5,10,20,19,17,13\}$, $\{7,14\}$ and $\{9,18,15\}$, so the two largest leaders are $9$ and $7$, again as predicted.
+This proves Theorem~\ref{thm:minus}.
+
+\section{Formal verification}\label{sec:lean}
+
+Both theorems are formalized in Lean~4 (version 4.33.1) with Mathlib.
+The statement is written from scratch:
+\begin{Verbatim}[fontsize=\small,frame=single]
+def IsCosetLeader (q n x : ℕ) : Prop :=
+  x < n ∧ ∀ i : ℕ, x ≤ (x * q ^ i) % n
+
+def FirstTwo (q n a b : ℕ) : Prop :=
+  IsCosetLeader q n a ∧ IsCosetLeader q n b ∧ b < a ∧
+    ∀ x, IsCosetLeader q n x → x ≤ b ∨ x = a
+
+theorem conjecturesA :
+    (∀ q m : ℕ, IsPrimePower q → Odd q → Odd m → 3 ≤ m →
+      FirstTwo q ((q + 1) * (q ^ m + 1)) (plusDeltaOne q m) (plusDeltaTwo q m)) ∧
+    (∀ q m : ℕ, IsPrimePower q → Odd m → 3 ≤ m →
+      FirstTwo q ((q + 1) * (q ^ m - 1)) (minusDeltaOne q m) (minusDeltaTwo q m))
+\end{Verbatim}
+Here \texttt{plusDeltaOne}, \texttt{plusDeltaTwo}, \texttt{minusDeltaOne} and \texttt{minusDeltaTwo} are the formulas of Conjecture~\ref{conj}, transcribed with natural-number division by $4$, which is exact in each case.
+For moduli coprime to $q$, \texttt{IsCosetLeader} says exactly that $x$ is the smallest element of its coset.
+The formal proof follows Sections~\ref{sec:plus} and~\ref{sec:minus}, with the digit-word arguments expressed through integer recurrences and inequalities; the two finite cases $n=21$ and $n=93$ are checked by the kernel.
+The proof uses no \texttt{sorry}, \texttt{native\_decide}, additional axioms or metaprogramming, and the theorem depends only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+
+\subsection*{Author contributions}
+A Claude Opus~5.5 agent surveying open problems in coding theory proposed the conjectures as a target.
+GPT-6-Astra checked the conjectures against the source, found the proofs and wrote the Lean formalization.
+Claude Fable~5.1 refereed the proofs and the formal statement against \cite{LWZ} and checked the formulas numerically, including for $q$ that are not prime powers.
+Claude Opus~5.5 checked the formal statement against \cite{LWZ}, restructured the formal proof for publication and wrote the manuscript.
+A human operator initiated the project and provided computing resources; the mathematics, the formal proofs and the text were produced by the models.
+
+\begin{thebibliography}{9}
+
+\bibitem{LLGS}
+Y.~Liu, R.~Li, L.~Guo and H.~Song,
+\emph{Dimensions of nonbinary antiprimitive BCH codes and some conjectures},
+Discrete Math. \textbf{346} (2023), no.~9, 113496; arXiv:1712.06842.
+
+\bibitem{LWZ}
+J.~Liu, H.~Wu and L.~Zhu,
+\emph{BCH and LCD cyclic codes of length $n=\lambda(q^m+1)$ over finite fields},
+arXiv:2603.07688v2 (2026).
+
+\end{thebibliography}
+
+\end{document}

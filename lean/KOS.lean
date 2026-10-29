@@ -3,3 +3,8 @@ import KOS.Phylogenetics.AncestralConfigurations.Independent
 import KOS.Phylogenetics.AncestralConfigurations.PaperDefinitions
 import KOS.NumberTheory.OEIS.A100475
 import KOS.Phylogenetics.LabeledHistories.Main
+import KOS.GraphTheory.ForcingNumbers.Main
+import KOS.CodingTheory.ThirdLargestCosetLeader.Main
+import KOS.ChemicalGraphTheory.LocalEnergy.Main
+import KOS.Phylogenetics.DepthVariance.Main
+import KOS.CodingTheory.TwoLargestCosetLeaders.Main

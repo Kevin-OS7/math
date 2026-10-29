@@ -41,6 +41,24 @@ results.append(('KOS/Phylogenetics/LabeledHistories/Main.lean', defs.rstrip() in
                 re.search(r'theorem conjecture14i\b\s*:\s*Conjecture14i', s) is not None and
                 re.search(r'theorem conjecture14ii\b\s*:\s*Conjecture14ii', s) is not None))
 
+# Results 004-007: definitions = from the namespace line up to the first challenge theorem.
+for ch_file, sol, ns, end_marker, thms in [
+        ('ComparatorChallenges/ForcingNumbers.lean', 'KOS/GraphTheory/ForcingNumbers/Main.lean',
+         'Forcing', '/-- Problem 5.5.', ['problem55']),
+        ('ComparatorChallenges/ThirdLargestCosetLeader.lean', 'KOS/CodingTheory/ThirdLargestCosetLeader/Main.lean',
+         'CosetB', 'theorem conjecture25_false', ['conjecture25_false', 'counterexample_q4_m12']),
+        ('ComparatorChallenges/LocalEnergy.lean', 'KOS/ChemicalGraphTheory/LocalEnergy/Main.lean',
+         'DedePopat', '/-- **Main theorem.**',
+         ['not_conjecture1', 'not_conjecture1NonEquienergetic', 'not_corollary2']),
+        ('ComparatorChallenges/DepthVariance.lean', 'KOS/Phylogenetics/DepthVariance/Main.lean',
+         'DepthVariance', '/-- Discussion, first conjecture', ['minimum_variance_depth_unique_false']),
+        ('ComparatorChallenges/TwoLargestCosetLeaders.lean', 'KOS/CodingTheory/TwoLargestCosetLeaders/Main.lean',
+         'CosetA', '-- Domain clarification made before proof', ['conjecturesA'])]:
+    ch = read(ch_file)
+    defs = between(ch, f'namespace {ns}\n', end_marker)
+    s = read(sol)
+    results.append((sol, defs in s, all(statement(ch, t) in s for t in thms)))
+
 ok = True
 for sol, d, t in results:
     print(f'{sol}: definitions verbatim: {d}; statement verbatim: {t}')

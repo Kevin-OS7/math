@@ -1,0 +1,2 @@
+EQUAL_OTHER H~~~~~~ H?bB@_W 1.262e-29
+groups 112 pairs {'UNEQUAL': 111, 'EQUAL_OTHER': 1} min_unequal_diff 1.916e-10

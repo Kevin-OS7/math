@@ -1,0 +1,372 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[no-math]{fontspec}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.82]
+\usepackage[margin=1.1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyvrb}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\BT}{\mathcal{BT}^{*}_{n}}
+
+\title[Minimum-variance trees are not unique]{Minimum-variance phylogenetic trees are not unique up to depth-equivalence}
+
+\author{GPT-6-Astra}
+\author{Claude Fable 5.1}
+\author{Claude Opus 5.5}
+\thanks{The authors are AI models: GPT-6-Astra (OpenAI) and Claude Fable~5.1 and Claude Opus~5.5 (Anthropic). Source files, scripts and Lean code: \url{https://github.com/Kevin-OS7/math}.}
+
+\date{October 29, 2026}
+
+\begin{document}
+
+\begin{abstract}
+Coronado, Mir, Rossell\'o and Rotger studied the variance $V(T)$ of the depths of the leaves of a rooted bifurcating tree $T$, the balance index originally proposed by Sackin.
+They gave an algorithm for the minimum of $V$ over the bifurcating trees with $n$ leaves, ran it for every $n\le 2^{20}$, and conjectured that for every $n$ the minimizing trees are unique up to depth-equivalence, that is, they all have the same multiset of leaf depths.
+We show that the conjecture is false.
+For $n=67{,}256{,}579$ there are two bifurcating trees with different multisets of leaf depths that both attain the minimum, $n^2V=330{,}431{,}494{,}786$.
+Using the structure theorem of Coronado et al., an exact search shows that this is the smallest such $n$, and that up to $2^{28}$ there are exactly six values of $n$ with two minimizing profiles.
+The proof of global minimality is self-contained.
+Cutting an arbitrary tree at a suitable level reduces the problem to a relaxed integer problem whose optimal solutions have a rigid normal form, and a certificate of $16{,}800$ exact integer evaluations completes the argument.
+The disproof, including the construction of the two trees and their global minimality among all bifurcating trees with $n$ leaves, is formalized and checked in Lean~4.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Balance indices quantify how symmetric the shape of a rooted phylogenetic tree is, and they are used to test models of evolution against the shapes of observed trees.
+As recalled in \cite{CMRR}, Sackin originally proposed to measure the imbalance of a tree by the ``variation'' of the depths of its leaves, and Kirkpatrick and Slatkin implemented this proposal as their variance.
+For a rooted bifurcating tree $T$ with $n$ leaves of depths $d_1,\dots,d_n$, this variance is
+\[
+V(T)=\frac1n\sum_{i=1}^n d_i^2-\Bigl(\frac1n\sum_{i=1}^n d_i\Bigr)^2 .
+\]
+Coronado, Mir, Rossell\'o and Rotger \cite{CMRR} studied $V$ as a balance index.
+They showed that its maximum over the bifurcating trees with $n$ leaves is attained exactly at the combs.
+Its minimum is attained at the maximally balanced trees for $n\le183$, but not for almost all larger $n$.
+They proved that every tree with minimum $V$ belongs to an explicit family of tree types (Theorem~\ref{thm:types} below), obtained from it an algorithm computing the minimum, and ran the algorithm for every $n\le2^{20}$.
+In the Discussion of \cite{CMRR} they list regularities observed in these computations; the first one is the following.
+
+\begin{conjecture}[{\cite[Discussion]{CMRR}}]\label{conj}
+For every $n$, the tree in $\BT$ with minimum $V$ value is unique up to depth-equivalence.
+\end{conjecture}
+
+Here $\BT$ is the set of rooted bifurcating tree shapes with $n$ leaves, and two trees are depth-equivalent when they have the same multiset of leaf depths.
+The characterization and the number of the trees of minimum $V$ are listed as open problems in the survey of tree balance indices by Fischer, Herbst, Kersting, K\"uhn and Wicke \cite{FHKKW}.
+
+\begin{theorem}\label{thm:main}
+Let $n=67{,}256{,}579$.
+The minimum of $n^2V(T)$ over all rooted bifurcating trees $T$ with $n$ leaves is $330{,}431{,}494{,}786$.
+It is attained by two trees $T_A$ and $T_B$ whose multisets of leaf depths are
+\begin{align*}
+\Delta(T_A)&=\{2,3,4,5,6,7,8,9,11,12,14,15,16,17,18,19\}\uplus\{26^{13},\,27^{67{,}256{,}550}\},\\
+\Delta(T_B)&=\{2,3,4,5,6,7,8,9,11,12,13\}\uplus\{27^{67{,}256{,}072},\,28^{496}\},
+\end{align*}
+where $d^{c}$ denotes $c$ leaves of depth $d$.
+In particular, Conjecture~\ref{conj} is false.
+\end{theorem}
+
+The two trees are not depth-equivalent: only $T_B$ has leaves of depth $28$.
+Since $n=2^{26}+147{,}715$, the counterexample lies far beyond the range $n\le2^{20}$ covered by the computations of \cite{CMRR}.
+Using the structure theorem of \cite{CMRR}, we also determined by an exact computation all $n\le2^{28}$ for which the minimizer is not unique up to depth-equivalence (Section~\ref{sec:computations}).
+There are exactly six, namely
+\[
+67{,}256{,}579,\quad 140{,}525{,}827,\quad 143{,}671{,}555,\quad 151{,}535{,}875,\quad 168{,}050{,}947,\quad 201{,}474{,}307,
+\]
+and for each of them there are exactly two minimizing profiles.
+In particular, $n=67{,}256{,}579$ is the smallest counterexample to Conjecture~\ref{conj}, and the computations of \cite{CMRR} for $n\le2^{20}$ are confirmed.
+
+The proof of minimality in Section~\ref{sec:proof} does not use the structure theorem of \cite{CMRR}.
+It bounds the centred second moment of a hypothetical better tree, cuts the tree at a suitable level, and relaxes the problem to an integer problem about ``coins'' whose optimal solutions have a rigid normal form.
+A finite certificate then shows that no tree beats $T_A$ and $T_B$.
+Section~\ref{sec:lean} describes the Lean formalization, which checks the whole argument.
+
+\section{Notation}
+
+A rooted bifurcating tree is a rooted tree in which every internal vertex has exactly two children; the tree with one vertex is allowed.
+The depth of a vertex is the number of edges on the path from the root to it.
+For a tree $T$ with $n$ leaves of depths $d_1,\dots,d_n$, let $\Delta(T)$ be the multiset $\{d_1,\dots,d_n\}$ and put
+\[
+S(T)=\sum_i d_i,\qquad Q(T)=\sum_i d_i^2,\qquad D(T)=nQ(T)-S(T)^2=n^2V(T).
+\]
+For fixed $n$, minimizing $V$ is the same as minimizing the integer $D$.
+For an integer $k$ we use the centred moments
+\[
+E_k(T)=\sum_i(k-d_i)=kn-S(T),\qquad R_k(T)=\sum_i(k-d_i)^2 .
+\]
+Since the variance does not change under translation,
+\begin{equation}\label{eq:centred}
+D(T)=nR_k(T)-E_k(T)^2\qquad\text{for every integer }k.
+\end{equation}
+
+A multiset $\{d_1,\dots,d_n\}$ of non-negative integers is the multiset of leaf depths of a rooted bifurcating tree if and only if $\sum_i 2^{-d_i}=1$ (Kraft's equality).
+Necessity follows by induction on the tree.
+For sufficiency, let $h$ be the largest depth; multiplying the equality by $2^h$ shows that the number of leaves of depth $h$ is even, so they can be paired into cherries whose parents have depth $h-1$, and induction on $\sum_i 2^{d_i}$ finishes the construction.
+
+The structure theorem of \cite{CMRR} reads as follows.
+Following \cite[Definition~3]{CMRR}, for $j\ge0$ and $2\le l_1<\dots<l_j\le\delta-2$, a tree of depth $\delta$ with $n$ leaves is \emph{of type} $T_{n;l_1,\dots,l_j}$ if it has exactly one leaf of depth $\delta-l_i$ for each $i=1,\dots,j$ and all its other leaves have depth $\delta$ or $\delta-1$.
+
+\begin{theorem}[{\cite[Theorem~2]{CMRR}}]\label{thm:types}
+If $T\in\BT$ has the minimum value of $V$, then it is of some type $T_{n;l_1,\dots,l_j}$ with $5\le l_1<\dots<l_j\le\delta(T)-2$.
+\end{theorem}
+
+We use Theorem~\ref{thm:types} only for the independent computations of Section~\ref{sec:computations}.
+
+\section{The two trees}\label{sec:trees}
+
+From now on $n=67{,}256{,}579$.
+Put
+\begin{align*}
+A&=\{8,9,10,11,12,13,15,16,18,19,20,21,22,23,24,25\},\\
+B&=\{14,15,16,18,19,20,21,22,23,24,25\}.
+\end{align*}
+The profile $\Delta(T_A)$ consists of one leaf of depth $27-t$ for each $t\in A$, $13$ leaves of depth $26$ and $67{,}256{,}550$ leaves of depth $27$.
+The profile $\Delta(T_B)$ consists of one leaf of depth $27-t$ for each $t\in B$, $67{,}256{,}072$ leaves of depth $27$ and $496$ leaves of depth $28$.
+Both have $n$ elements, and both satisfy Kraft's equality:
+\[
+\sum_{t\in A}2^{t}+13\cdot 2+67{,}256{,}550=2^{27},\qquad
+\sum_{t\in B}2^{t}+67{,}256{,}072+\frac{496}{2}=2^{27}.
+\]
+Concretely, $T_A$ can be built from a path $v_0,v_1,\dots,v_{22}$ starting at the root $v_0$.
+For $t=26,25,\dots,5$, the vertex $v_{26-t}$ receives as its second child, at depth $27-t$, a single leaf if $t\in A$ and a perfect binary tree of height $t$ otherwise.
+Finally, $v_{22}$ is the root of a tree with $13$ leaves of depth $26$ and $6$ leaves of depth $27$.
+The tree $T_B$ is built in the same way from a path $v_0,\dots,v_{18}$ with $t=26,\dots,9$ and the set $B$, and $v_{18}$ is the root of a tree with $264$ leaves of depth $27$ and $496$ of depth $28$.
+In the notation of \cite{CMRR}, $T_A$ is of type $T_{n;8,9,10,11,12,13,15,16,18,19,20,21,22,23,24,25}$ (depth $27$) and $T_B$ is of type $T_{n;15,16,17,19,20,21,22,23,24,25,26}$ (depth $28$).
+
+With respect to the level $k=27$,
+\[
+E_{27}(T_A)=\sum_{t\in A}t+13=279,\qquad R_{27}(T_A)=\sum_{t\in A}t^2+13=4913,
+\]
+\[
+E_{27}(T_B)=\sum_{t\in B}t-496=-279,\qquad R_{27}(T_B)=\sum_{t\in B}t^2+496=4913 .
+\]
+By \eqref{eq:centred} both trees have
+\[
+D=4913\,n-279^2=330{,}431{,}494{,}786 .
+\]
+Thus the two trees tie because their centred first moments are opposite and their centred second moments agree.
+
+\section{Global minimality}\label{sec:proof}
+
+Put $C=4913$ and $D^*=Cn-279^2$.
+We prove that every bifurcating tree $T$ with $n$ leaves satisfies $D(T)\ge D^*$; together with Section~\ref{sec:trees} this proves Theorem~\ref{thm:main}.
+So let $T$ have $n$ leaves and suppose $D(T)\le D^*$.
+
+\subsection{A bound on the centred second moment}
+
+\begin{lemma}\label{lem:center}
+Let $k$ be a non-negative integer nearest to $S(T)/n$, and write $E=E_k(T)$, $R=R_k(T)$.
+Then $R\le C$ and $27\le k\le96$.
+\end{lemma}
+
+\begin{proof}
+By the choice of $k$ we have $|E|\le n/2$.
+Since $|z|\le z^2$ for every integer $z$, also $|E|\le\sum_i|k-d_i|\le R$.
+Hence $E^2\le Rn/2$, so $D(T)=nR-E^2\ge nR/2$ and $R\le 2D^*/n<2C$.
+Suppose $R\ge C+1$.
+Using $E^2\le R^2$ and the fact that $u\mapsto nu-u^2$ is increasing for $u<n/2$, we get
+\[
+D(T)\ge nR-R^2\ge (C+1)n-(C+1)^2>Cn-279^2,
+\]
+where the last inequality holds because $n>(C+1)^2-279^2=24{,}069{,}555$.
+This contradicts $D(T)\le D^*$, so $R\le C$.
+
+For the range of $k$ we use the cut at level $k$ described next.
+The relations \eqref{eq:x} and \eqref{eq:moments} below give $2x\le Q_{\mathrm{deep}}\le R\le C$, so $x\le2456$, and \eqref{eq:count} gives $n\le 2^k+x$.
+Since $n-2456>2^{26}$, this forces $k\ge27$.
+On the other hand, a bifurcating tree whose shallowest leaf has depth $d_{\min}$ has at least $2^{d_{\min}}$ leaves, so $T$ has a leaf of depth at most $26$.
+That leaf contributes $(k-26)^2$ or more to $R$, so $(k-26)^2\le C<71^2$ and $k\le96$.
+\end{proof}
+
+\subsection{Cutting at a level}
+
+Fix an integer $k\ge0$.
+Let $M$ be the multiset of the gaps $t=k-d\ge1$ of the leaves of $T$ of depth $d<k$, the \emph{shallow} leaves.
+The vertices of $T$ at depth exactly $k$ are the roots of disjoint subtrees $U_1,\dots,U_p$, which contain all the other leaves.
+Let $m_u$ be the number of leaves of $U_u$, and put
+\[
+x=\sum_u(m_u-1),\qquad S_{\mathrm{deep}}=\sum_u S(U_u),\qquad Q_{\mathrm{deep}}=\sum_u Q(U_u),
+\]
+with depths in $U_u$ measured from its root.
+In the perfect binary tree of height $k$, a shallow leaf with gap $t$ occupies $2^t$ positions at level $k$ and each root of a subtree $U_u$ occupies one, so $\sum_{t\in M}2^t+p=2^k$.
+Since $n=|M|+\sum_u m_u=|M|+p+x$, this becomes
+\begin{equation}\label{eq:count}
+\sum_{t\in M}\bigl(2^t-1\bigr)=2^k-n+x .
+\end{equation}
+For a bifurcating tree $U$ with $m$ leaves we have $2(m-1)\le S(U)\le Q(U)$: the first inequality holds because $S(U)$ is the sum, over the $m-1$ internal vertices, of their numbers of descendant leaves, each at least $2$; the second because $d\le d^2$.
+Summing over the subtrees,
+\begin{equation}\label{eq:x}
+2x\le S_{\mathrm{deep}}\le Q_{\mathrm{deep}},
+\end{equation}
+and directly from the definitions,
+\begin{equation}\label{eq:moments}
+E_k(T)=\sum_{t\in M}t-S_{\mathrm{deep}},\qquad R_k(T)=\sum_{t\in M}t^2+Q_{\mathrm{deep}} .
+\end{equation}
+Consequently the \emph{coin cost}
+\[
+c(M,x)=\sum_{t\in M}t^2+2x
+\]
+satisfies $c(M,x)\le R_k(T)$, and if equality holds then $S_{\mathrm{deep}}=Q_{\mathrm{deep}}=2x$ and
+\begin{equation}\label{eq:Eeq}
+E_k(T)=\sum_{t\in M}t-2x .
+\end{equation}
+
+\subsection{The relaxed coin problem}
+
+Fix an integer $r\ge0$ and consider all pairs $(M,x)$ of a finite multiset $M$ of positive integers and an integer $x\ge0$ satisfying the coin equation
+\begin{equation}\label{eq:coin}
+\sum_{t\in M}\bigl(2^t-1\bigr)=r+x .
+\end{equation}
+We call such a pair feasible and minimize $c(M,x)$.
+Since costs are non-negative integers, a feasible pair of minimum cost exists whenever a feasible pair exists.
+
+\begin{lemma}\label{lem:normal}
+Every feasible pair of minimum cost has the following form: $M$ consists of $a$ copies of $1$ together with a set $L$ of distinct integers $\ge5$, and $a=0$ or $x=0$.
+\end{lemma}
+
+\begin{proof}
+Each of the following replacements preserves \eqref{eq:coin} and strictly lowers the cost, so none of them applies to a pair of minimum cost.
+(i) Replace a gap $t\in\{2,3,4\}$ by $2^t-1$ gaps equal to $1$; the cost changes by $(2^t-1)-t^2\in\{-1,-2,-1\}$.
+(ii) Replace two gaps $t\ge5$ by one gap $t+1$ and increase $x$ by one; since $(2^{t+1}-1)-2(2^t-1)=1$, \eqref{eq:coin} is preserved, and the cost changes by $(t+1)^2+2-2t^2=-(t-3)(t+1)<0$.
+(iii) If $x>0$ and $1\in M$, remove one gap $1$ and decrease $x$ by one; the cost decreases by $3$.
+\end{proof}
+
+For a pair in this normal form let $j=|L|$ and let $b=\sum_{t\in L}2^{t-5}$, so that $L$ is read off from the binary digits of $b$, and
+\[
+\sum_{t\in L}\bigl(2^t-1\bigr)=32b-j=:A(b).
+\]
+The coin equation determines $a$ and $x$: if $A(b)\le r$ then $x=0$ and $a=r-A(b)$, and if $A(b)>r$ then $a=0$ and $x=A(b)-r$.
+Hence the cost and the right-hand side of \eqref{eq:Eeq} are
+\begin{align*}
+F(r,b)&=\sum_{t\in L}t^2+\max\bigl(r-A(b),0\bigr)+2\max\bigl(A(b)-r,0\bigr),\\
+G(r,b)&=\sum_{t\in L}t+\max\bigl(r-A(b),0\bigr)-2\max\bigl(A(b)-r,0\bigr).
+\end{align*}
+If $F(r,b)\le C$, then $a\le C$, $x\le\lfloor C/2\rfloor=2456$ and $25j\le C$, so $j\le196$.
+Since $32b=r+x-a+j$, it follows that $r-C\le 32b\le r+2652$, and therefore
+\begin{equation}\label{eq:window}
+b=\Bigl\lfloor\frac{r-C}{32}\Bigr\rfloor+i\qquad\text{for some }0\le i<240 .
+\end{equation}
+
+\subsection{The certificate}
+
+For $27\le k\le96$ and $0\le i<240$ put $r=2^k-n$ (so $r>C$) and let $b$ be given by \eqref{eq:window}.
+Evaluating $F$ and $G$ in exact integer arithmetic at these $70\cdot240=16{,}800$ points shows:
+\begin{equation}\label{eq:cert}
+F(r,b)\le C\ \Longrightarrow\ k=27,\quad F(r,b)=C,\quad G(r,b)^2=279^2 .
+\end{equation}
+Exactly two points satisfy the premise, both with $k=27$: $i=154$, $b=2{,}092{,}536$, $L=A$, $G=279$; and $i=162$, $b=2{,}092{,}544$, $L=B$, $G=-279$.
+They correspond to the trees $T_A$ and $T_B$.
+
+\subsection{Conclusion of the proof}
+
+Let $k$ be as in Lemma~\ref{lem:center}, and let $(M,x)$ be obtained by cutting $T$ at level $k$.
+By \eqref{eq:count}, $(M,x)$ is feasible for $r=2^k-n$, and $c(M,x)\le R_k(T)\le C$.
+Take a feasible pair of minimum cost for this $r$.
+It has the normal form of Lemma~\ref{lem:normal}, its cost is at most $C$, and its $b$ satisfies \eqref{eq:window}; by \eqref{eq:cert} its cost equals $C$.
+Hence the minimum cost is $C$, so $c(M,x)=C$, and $(M,x)$ itself has minimum cost.
+Applying Lemma~\ref{lem:normal} and \eqref{eq:cert} to $(M,x)$ shows that $\sum_{t\in M}t-2x=G(r,b)=\pm279$.
+Since $c(M,x)=C\ge R_k(T)\ge c(M,x)$, equality holds, and by \eqref{eq:Eeq} $E_k(T)=\pm279$.
+By \eqref{eq:centred}, $D(T)=nC-279^2=D^*$.
+Thus no tree has $D<D^*$, which proves Theorem~\ref{thm:main}.
+
+\section{Computations}\label{sec:computations}
+
+All computations below use exact integer arithmetic; the scripts accompany the source files.
+
+\emph{The certificate.} The script \texttt{verify\_certificate.py} evaluates the $16{,}800$ entries of \eqref{eq:cert}, prints the two successful entries, and checks the two profiles (Kraft's equality, the number of leaves, and $D$).
+A re-check of the certificate over the wider window $-300\le i<1000$ finds no further solutions; for $k\ge28$ the smallest value of $F$ is $5640$.
+
+\emph{The family of Theorem~\ref{thm:types}.} Two independent programs enumerate all types $T_{n;l_1,\dots,l_j}$ with $5\le l_1<\dots<l_j\le\delta-2$ for $\delta\in\{26,27,28\}$.
+Both find $2{,}101{,}768$ realizable types for $n=67{,}256{,}579$, with minimum $D=330{,}431{,}494{,}786$ attained exactly by the types of $T_A$ and $T_B$.
+This confirms Theorem~\ref{thm:main} by a route that uses Theorem~\ref{thm:types} instead of Section~\ref{sec:proof}.
+
+\emph{Small $n$.} An exhaustive enumeration of all leaf-depth profiles for $n\le 24$ agrees with the minimum over the family of Theorem~\ref{thm:types}, with a unique minimizing profile in each case.
+
+\emph{All $n\le2^{28}$.} For each $n$ we computed the minimum of $D$ over the family of Theorem~\ref{thm:types} (types with $\delta\in\{m,m+1,m+2\}$, where $m=\lfloor\log_2n\rfloor$; indeed $2^\delta\ge n$, and Kraft's equality gives $2^\delta=p_0+2p_1+\sum_i2^{l_i}<2n+2^{\delta-1}$, where $p_0$ and $p_1$ are the numbers of leaves of depths $\delta$ and $\delta-1$) and the number of minimizing types.
+For $5\le n\le2^{20}$ we enumerated the whole family (program \texttt{minvar\_scan.c}); the minimizer is unique for every such $n$, in agreement with \cite{CMRR}.
+For larger $n$ we used a pruned enumeration (\texttt{minvar\_fast.c}) based on the following observation.
+Let $c$ be an integer nearest to the mean depth of a candidate; then $c\in\{\delta-1,\delta\}$, because the mean depth is $\delta-(p_1+l_1+\dots+l_j)/n$ with $l_1+\dots+l_j<m^2<n/2$, and $D\ge nR_c/2$ as in the proof of Lemma~\ref{lem:center}.
+If $c=\delta$, then $R_c$ is at least the number $p_1$ of leaves of depth $\delta-1$, and if $c=\delta-1$, then $R_c$ is at least the number $p_0$ of leaves of depth $\delta$.
+So every candidate with $D\le D_{\mathrm{best}}$ has $p_1\le 2D_{\mathrm{best}}/n$ or $p_0\le 2D_{\mathrm{best}}/n$, which confines the binary encoding of $\{l_1,\dots,l_j\}$ to two short windows for each $\delta$.
+For $n\le2^{20}$ the pruned and the full enumeration agree for every $n$.
+The pruned scan of all $n\le2^{28}$ takes a few minutes on six cores and finds non-uniqueness exactly for the six values of $n$ listed in the introduction, each with two minimizing types.
+
+\begin{remark}
+All six ties have the same structure as the pair $(T_A,T_B)$.
+For a depth $\delta$ and a set $L\subseteq\{15,\dots,\delta-2\}$, let $\mathcal A_L$ be the type of depth $\delta$ with gaps $\{8,\dots,13\}\cup L$ and $13$ leaves of depth $\delta-1$, and let $\mathcal B_L$ be the type of depth $\delta+1$ with gaps $\{15\}\cup(L+1)$ and $496$ leaves of depth $\delta+1$.
+Kraft's equality shows that both have $n=2^\delta-16135-\sum_{l\in L}2^l+|L|$ leaves.
+With respect to the level $\delta$ both have $R_\delta=692+\sum_{l\in L}l^2$, while $E_\delta(\mathcal A_L)=76+\sum_{l\in L}l$ and $E_\delta(\mathcal B_L)=\sum_{l\in L}l-482$.
+So $D(\mathcal A_L)=D(\mathcal B_L)$ exactly when $\sum_{l\in L}l=203$.
+The six counterexamples are the cases where, in addition, these two types are minimizers: $\delta=27$ with $L=\{15,16,18,\dots,25\}$ (this is $(T_A,T_B)$), and $\delta=28$ with five sets $L$ of ten elements.
+\end{remark}
+
+\emph{Neighbouring values.} For $n+1=67{,}256{,}580$ the minimizer is unique and of type $T_{n+1;A}$, and for $n-1$ it is unique and of the type of $T_B$.
+So this value of $n$ does not contradict the third regularity listed in the Discussion of \cite{CMRR}, which concerns the passage from $n$ to $n+1$.
+
+\section{Formal verification}\label{sec:lean}
+
+The statement and its refutation are formalized in Lean~4 (version 4.33.1) with Mathlib.
+Trees are ordered binary trees, and the definitions follow the paper:
+\begin{Verbatim}[fontsize=\small,frame=single]
+inductive BTree where
+  | leaf : BTree
+  | fork : BTree → BTree → BTree
+
+def leafDepths : BTree → Multiset ℕ
+  | .leaf => {0}
+  | .fork l r => (leafDepths l + leafDepths r).map Nat.succ
+
+def depthObjective (T : BTree) : ℤ :=
+  ((leafCount T) : ℤ) * (depthSquareSum T) - (depthSum T) ^ 2
+
+def MinimizesDepthVariance (n : ℕ) (T : BTree) : Prop :=
+  (leafCount T) = n ∧
+    ∀ U : BTree, (leafCount U) = n → (depthObjective T) ≤ (depthObjective U)
+\end{Verbatim}
+Here \texttt{leafCount}, \texttt{depthSum} and \texttt{depthSquareSum} are the number of leaves, $S$ and $Q$, computed from \texttt{leafDepths}.
+Ordering the children does not matter: every tree shape has an ordered representative and all quantities are invariant under swapping children.
+The main theorem is the negation of the conjecture as stated:
+\begin{Verbatim}[fontsize=\small,frame=single]
+theorem minimum_variance_depth_unique_false :
+    ¬ (∀ (n : ℕ), 1 ≤ n → ∀ (T T' : BTree),
+      MinimizesDepthVariance n T → MinimizesDepthVariance n T' →
+      leafDepths T = leafDepths T')
+\end{Verbatim}
+The trees $T_A$ and $T_B$ are given as explicit terms built from perfect trees along a path, as in Section~\ref{sec:trees}; their numbers of leaves and their values of $S$ and $Q$ are computed symbolically.
+Minimality is proved along the lines of Section~\ref{sec:proof}, for an arbitrary \texttt{BTree} with $n$ leaves.
+The cut at level $k$ and the bounds \eqref{eq:count}--\eqref{eq:moments} are proved by induction on trees.
+The normal form uses the minimum of a feasible set (\texttt{Nat.find}) and the replacements of Lemma~\ref{lem:normal}.
+The $16{,}800$ evaluations of \eqref{eq:cert} are carried out by a Boolean checker whose soundness is proved in Lean, and the checker's run is verified by the kernel (\texttt{decide +kernel}).
+No \texttt{sorry}, \texttt{native\_decide}, additional axioms or metaprogramming are used.
+The whole file checks in about 45 seconds, and the main theorem depends only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+
+\subsection*{Author contributions}
+GPT-6-Astra, acting as an advisor surveying open problems in mathematical biology, proposed the conjecture as a target.
+It then found the counterexample and the proof of minimality and wrote the Lean formalization and the certificate.
+Claude Fable~5.1 refereed the proof and the formalization against the definitions of \cite{CMRR}, and independently re-checked the certificate, the enumeration of the family of Theorem~\ref{thm:types}, the normal form, and the small and neighbouring cases.
+Claude Opus~5.5 re-checked the formalization and the computations, carried out the scan for $n\le2^{20}$, and wrote the manuscript.
+A human operator initiated the project and provided computing resources; the mathematics, the formal proofs and the text were produced by the models.
+
+\begin{thebibliography}{9}
+
+\bibitem{CMRR}
+T.~M.~Coronado, A.~Mir, F.~Rossell\'o and L.~Rotger,
+\emph{On Sackin's original proposal: the variance of the leaves' depths as a phylogenetic balance index},
+BMC Bioinformatics \textbf{21} (2020), 154; doi:10.1186/s12859-020-3405-1.
+
+\bibitem{FHKKW}
+M.~Fischer, L.~Herbst, S.~Kersting, A.~L.~K\"uhn and K.~Wicke,
+\emph{Tree Balance Indices: A Comprehensive Survey},
+Springer, 2023; arXiv:2109.12281.
+
+\end{thebibliography}
+
+\end{document}

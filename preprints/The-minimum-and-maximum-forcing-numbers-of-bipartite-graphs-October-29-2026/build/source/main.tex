@@ -1,0 +1,208 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{xcolor}
+\usepackage[no-math]{fontspec}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.82]
+\usepackage[margin=1.1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{fancyvrb}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{problem}[theorem]{Problem}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title[Minimum and maximum forcing numbers]{The minimum and maximum forcing numbers of bipartite graphs:\\ an answer to a question of Liu, Diwan and Zhang}
+
+\author{GPT-6-Astra}
+\author{Claude Fable 5.1}
+\author{Claude Opus 5.5}
+\thanks{The authors are AI models: GPT-6-Astra (OpenAI) and Claude Fable~5.1 and Claude Opus~5.5 (Anthropic). Source files and Lean code: \url{https://github.com/Kevin-OS7/math}.}
+
+\date{October 29, 2026}
+
+\begin{document}
+
+\begin{abstract}
+For a perfect matching $M$ of a graph $G$, the forcing number $f(G,M)$ is the smallest size of a subset of $M$ contained in no other perfect matching; the minimum and maximum of $f(G,M)$ over all perfect matchings are denoted $f(G)$ and $F(G)$.
+The notion goes back to the ``innate degree of freedom'' of Kekul\'e structures in chemistry.
+Liu, Diwan and Zhang asked whether every bipartite graph $G$ of order $2n$ with $F(G)\ge n-k$, where $1\le k\le n-1$, satisfies $f(G)\ge\lceil n/k\rceil-1$; they proved this for $k=1,2$.
+We answer the question affirmatively for all $k$.
+Equivalently, every bipartite graph of order $2n$ with a perfect matching satisfies
+\[
+n\le\bigl(f(G)+1\bigr)\bigl(n-F(G)\bigr).
+\]
+The proof combines the triangular structure of a bipartite graph with a unique perfect matching, an interval representation of an arbitrary perfect matching, and the greedy algorithm for interval scheduling.
+The result has been formally verified in Lean~4 with Mathlib.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Let $G$ be a finite simple graph with a perfect matching $M$.
+A subset $S\subseteq M$ is a \emph{forcing set} of $M$ if no other perfect matching of $G$ contains $S$, and the \emph{forcing number} $f(G,M)$ is the smallest size of a forcing set of $M$.
+The concept originates in chemistry: perfect matchings of the graph of a benzenoid hydrocarbon are its Kekul\'e structures, and Klein and Randi\'c \cite{KR} introduced the \emph{innate degree of freedom} of a Kekul\'e structure, the forcing number in today's terminology \cite{HKZ}.
+The \emph{minimum} and \emph{maximum forcing numbers} of $G$ are
+\[
+f(G)=\min_M f(G,M),\qquad F(G)=\max_M f(G,M),
+\]
+the extrema being over all perfect matchings.
+If $G$ has order $2n$ then $0\le f(G)\le F(G)\le n-1$.
+
+Liu, Diwan and Zhang \cite{LDZ} studied graphs whose maximum forcing number is large.
+They showed that for a bipartite graph $G$ of order $2n$, $F(G)=n-1$ holds only for $K_{n,n}$, and that $F(G)=n-2$ implies $f(G)\ge\lceil n/2\rceil-1$, and they proposed the following problem \cite[Problem~5.5]{LDZ}.
+
+\begin{problem}[Liu--Diwan--Zhang]\label{prob}
+Let $G$ be a bipartite graph of order $2n$ and with $F(G)\ge n-k$ for $1\le k\le n-1$.
+Does $f(G)\ge\lceil n/k\rceil-1$ always hold?
+\end{problem}
+
+We answer Problem~\ref{prob} affirmatively.
+
+\begin{theorem}\label{thm:main}
+Let $G$ be a finite bipartite graph of order $2n$ with a perfect matching.
+Then
+\[
+n\le\bigl(f(G)+1\bigr)\bigl(n-F(G)\bigr).
+\]
+\end{theorem}
+
+\begin{corollary}\label{cor}
+The answer to Problem~\ref{prob} is yes: if $F(G)\ge n-k$ with $1\le k\le n-1$, then $f(G)\ge\lceil n/k\rceil-1$.
+\end{corollary}
+
+\begin{proof}
+We have $n-F(G)\le k$, so Theorem~\ref{thm:main} gives $n\le k\,(f(G)+1)$, i.e.\ $f(G)+1\ge\lceil n/k\rceil$.
+\end{proof}
+
+Conversely, Corollary~\ref{cor} applied with $k=n-F(G)$ gives Theorem~\ref{thm:main} whenever $F(G)\ge1$, and for $F(G)=0$ the theorem is trivial; so the two statements are equivalent, and Theorem~\ref{thm:main} is the answer to Problem~\ref{prob} for all $k$ at once.
+Connectedness of $G$ is not needed.
+
+The bound is attained.
+By exhaustive computation over all bipartite graphs with $n\le 5$ and random sampling for $6\le n\le 9$, equality $n=(f(G)+1)(n-F(G))$ occurs for non-complete graphs, for instance with $(n,f,F)=(4,1,2)$, $(6,1,3)$, $(6,2,4)$, $(8,1,4)$, $(8,3,6)$ and $(9,2,6)$; and the graphs constructed in \cite[Remark~5.6]{LDZ} satisfy $F(G)=n-k$ and $f(G)=\lceil n/k\rceil-1$ in all $14$ cases with $n\le 10$ that we checked.
+
+\section{Two lemmas}
+
+Throughout, $G$ is a finite simple graph and a perfect matching is a set of pairwise disjoint edges covering every vertex.
+
+\begin{lemma}\label{lem:forcing}
+Let $M$ be a perfect matching of $G$ and $S\subseteq M$.
+Then $S$ is a forcing set of $M$ if and only if the graph $G-V(S)$ obtained by deleting the endpoints of $S$ has a unique perfect matching.
+\end{lemma}
+
+\begin{proof}
+The perfect matchings of $G$ containing $S$ are exactly the sets $S\cup N$ with $N$ a perfect matching of $G-V(S)$; one of them is $M$, obtained from $N=M\setminus S$.
+\end{proof}
+
+The following description of bipartite graphs with a unique perfect matching is classical (see \cite[Ch.~4]{LP}); we include the short proof.
+
+\begin{lemma}[Triangular ordering]\label{lem:triangular}
+Let $H$ be a finite bipartite graph with a unique perfect matching $\{a_ib_i: i\in I\}$, the vertices $a_i$ and $b_i$ lying on opposite sides.
+Then the index set can be numbered $1,\dots,m$ so that every edge $a_ib_j$ of $H$ satisfies $i\le j$.
+\end{lemma}
+
+\begin{proof}
+Put an arc $i\to j$ on $I$ whenever $i\ne j$ and $a_ib_j$ is an edge.
+If $i_1\to i_2\to\cdots\to i_t\to i_1$ were a directed cycle, replacing the edges $a_{i_s}b_{i_s}$ by $a_{i_s}b_{i_{s+1}}$ (indices mod $t$) would give a second perfect matching.
+Hence the digraph is acyclic, and a topological ordering is the required numbering.
+\end{proof}
+
+\section{Proof of Theorem~\ref{thm:main}}
+
+Let $s=f(G)$, and choose a perfect matching $M_0$ with a forcing set $S_0$ of size $s$.
+Let $(A,B)$ be a bipartition of $G$; a perfect matching is a bijection between $A$ and $B$, so $|A|=|B|=n$.
+Deleting the endpoints of $S_0$ removes $s$ vertices from each side, and by Lemma~\ref{lem:forcing} the induced subgraph $H=G-V(S_0)$ has the unique perfect matching $M_0\setminus S_0$.
+Let $m=n-s$ and use Lemma~\ref{lem:triangular} to label the vertices of $H$ as $a_1,\dots,a_m\in A$ and $b_1,\dots,b_m\in B$ so that every edge $a_ib_j$ of $H$, hence (since $H$ is an induced subgraph) every edge of $G$ between these vertices, satisfies $i\le j$.
+Define coordinates
+\begin{gather*}
+L(a_i)=i,\quad R(b_i)=i\quad(1\le i\le m),\\
+L(a)=0\ \ (a\in A\cap V(S_0)),\qquad R(b)=m+1\ \ (b\in B\cap V(S_0)).
+\end{gather*}
+
+Now let $M$ be an arbitrary perfect matching of $G$.
+To each edge $e=ab\in M$ with $a\in A$, $b\in B$ assign the integer interval $I_e=[L(a),R(b)]$.
+It is nonempty: if both endpoints lie in $H$ this is the triangularity, and otherwise $L(a)=0$ or $R(b)=m+1$.
+
+\emph{Every integer lies in at most $s+1$ of these intervals.}
+Fix $1\le t\le m$.
+The intervals with $L\le t$ are those of the $M$-edges at the $s$ deleted vertices of $A$ and at $a_1,\dots,a_t$, so there are $s+t$ of them.
+The intervals with $R<t$ are those of the $M$-edges at $b_1,\dots,b_{t-1}$; there are $t-1$ of them, and each also has $L\le t$ because it is nonempty.
+Hence exactly $(s+t)-(t-1)=s+1$ intervals contain $t$.
+The integers $0$ and $m+1$ lie in exactly $s$ intervals each, and other integers in none.
+
+\emph{Greedy selection.}
+Repeat the following until no interval is left: choose a remaining interval $I_e$ with the smallest right endpoint $r$, put $e$ into $T$, and remove all remaining intervals that contain $r$ (including $I_e$).
+Every remaining interval has right endpoint at least $r$, so the removed intervals are exactly those with left endpoint at most $r$, and the intervals left for later steps start after $r$.
+Consequently the intervals $I_e$, $e\in T$, are pairwise disjoint, and since each step removes at most $s+1$ intervals,
+\begin{equation}\label{eq:greedy}
+n=|M|\le(s+1)\,|T|.
+\end{equation}
+
+\emph{$M\setminus T$ forces $M$.}
+List the edges of $T$ as $a'_1b'_1,\dots,a'_tb'_t$ with their intervals from left to right, so that $R(b'_i)<L(a'_j)$ for $i<j$.
+These strict inequalities imply that $b'_i$ and $a'_j$ lie in $H$ (a deleted vertex of $B$ has the maximal coordinate $m+1$, and a deleted vertex of $A$ has coordinate $0$), and then triangularity shows that $a'_jb'_i$ is not an edge of $G$ for $i<j$.
+Let $N$ be a perfect matching of $G$ containing $M\setminus T$.
+The edges of $M\setminus T$ cover every vertex outside $V(T)$, so the remaining edges $N\setminus(M\setminus T)$ form a perfect matching between $\{a'_1,\dots,a'_t\}$ and $\{b'_1,\dots,b'_t\}$; write them as $a'_ib'_{\sigma(i)}$ for a permutation $\sigma$.
+Since there are no edges $a'_jb'_i$ with $i<j$, we have $\sigma(i)\ge i$ for all $i$, hence $\sigma$ is the identity and $N=M$.
+
+Therefore $f(G,M)\le|M\setminus T|=n-|T|$, and \eqref{eq:greedy} gives $n\le(s+1)|T|\le(s+1)\,(n-f(G,M))$.
+Choosing $M$ with $f(G,M)=F(G)$ proves the theorem. \qed
+
+\section{Formal verification}
+
+The statement of Problem~\ref{prob} was formalized in Lean~4 (version 4.33.1) with Mathlib, following the definitions of \cite{LDZ}:
+\begin{Verbatim}[fontsize=\small,frame=single]
+def IsPerfectMatching (G : SimpleGraph V) (M : Finset (Sym2 V)) : Prop :=
+  (∀ e ∈ M, e ∈ G.edgeSet) ∧ ∀ v, ∃! w, s(v, w) ∈ M
+def IsForcingSet (G : SimpleGraph V) (M S : Finset (Sym2 V)) : Prop :=
+  S ⊆ M ∧ ∀ N, IsPerfectMatching G N → S ⊆ N → N = M
+noncomputable def forcingNumber (G : SimpleGraph V) (M : Finset (Sym2 V)) : ℕ :=
+  sInf {r | ∃ S, IsForcingSet G M S ∧ S.card = r}
+-- minForcingNumber / maxForcingNumber: sInf / sSup over perfect matchings
+
+theorem problem55 (G : SimpleGraph V) (n k : ℕ)
+    (hG : G.IsBipartite) (horder : Fintype.card V = 2 * n)
+    (hpm : ∃ M, IsPerfectMatching G M)
+    (hk : 1 ≤ k) (hkn : k ≤ n - 1)
+    (hF : n - k ≤ maxForcingNumber G) :
+    (n + k - 1) / k - 1 ≤ minForcingNumber G
+\end{Verbatim}
+Here $V$ is a finite type with decidable equality, and $\lceil n/k\rceil$ is written as \texttt{(n + k - 1) / k}.
+The theorem is proved without \texttt{sorry} or \texttt{native\_decide} and depends only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}; the statement was also checked with Comparator against a separately fixed statement file.
+The formalization is the file \nolinkurl{lean/KOS/GraphTheory/ForcingNumbers/Main.lean} of the repository.
+
+\subsection*{Author contributions}
+The problem was selected by a Claude Opus~5.5 agent searching the chemistry and mathematical biology literature for open problems.
+GPT-6-Astra found the proof and wrote the Lean formalization.
+Claude Fable~5.1 refereed the proof against the definitions of \cite{LDZ}, re-checked the formalization, and carried out the exhaustive and random computations.
+Claude Opus~5.5 checked the proof and the formalization and wrote the manuscript.
+A human operator initiated the project and provided computing resources; the mathematics, the formal proofs and the text were produced by the models.
+
+\begin{thebibliography}{9}
+
+\bibitem{HKZ}
+F.~Harary, D.~J. Klein and T.~P. \v{Z}ivkovi\'c,
+\emph{Graphical properties of polyhexes: perfect matching vector and forcing},
+J. Math. Chem. \textbf{6} (1991), 295--306.
+
+\bibitem{KR}
+D.~J. Klein and M.~Randi\'c,
+\emph{Innate degree of freedom of a graph},
+J. Comput. Chem. \textbf{8} (1987), 516--521.
+
+\bibitem{LDZ}
+Q.~Liu, A.~A. Diwan and H.~Zhang,
+\emph{Graphs with large maximum forcing number},
+arXiv:2512.22761 (2025).
+
+\bibitem{LP}
+L.~Lov\'asz and M.~D. Plummer,
+\emph{Matching Theory},
+North-Holland, Amsterdam, 1986.
+
+\end{thebibliography}
+
+\end{document}

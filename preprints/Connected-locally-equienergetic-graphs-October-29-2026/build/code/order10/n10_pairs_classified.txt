@@ -1,0 +1,63 @@
+EXACT ICY^Nrw\_ ICpvfZwN_
+EXACT I?ovfb{~? I?qffrs~?
+EXACT I?o~fb{~? I?qnfrs~?
+EXACT ICdffZk]_ ICpdrnw^?
+EXACT I?qa``kWo ICOeeOwFG
+EXACT I?r@`aiUg I?r@`aiXg
+EXACT I?qafbE|_ ICOfDpwpw
+EXACT I?q`tVo}_ I?qdV`k}G
+EXACT ICRVFqmNo ICpbbr{n_
+EXACT ICQVdvk^G I?qbrj]nO
+EXACT ICrbP|{}_ ICrbbq}~?
+EXACT ICQvdvk^G ICRdrruzO
+EXACT ICpvfq{Z_ ICxvFjYN_
+EXACT I?ovDb[^? ICQf@\[]_
+EXACT ICrbcx{{_ ICpfbg}v?
+EXACT ICQbvRpNw I?qvAurvg
+EXACT ICpdf_][o ICpdf_]lO
+EXACT I?otQji\O ICQTddkZG
+EXACT ICZbazR|o ICpbtrqjw
+EXACT ICOedPyjo I?qacimVo
+EXACT I?qacymVo I?qabYmVo
+EXACT ICQrThix_ ICQrThiZO
+EXACT ICQfK~w^G I?otvJ]^O
+EXACT I?qa`iTu_ ICOedPYjO
+EXACT ICQfMhwMw ICp`f`m}_
+EXACT I?o~Fa{~? ICpbtrobw
+EXACT ICpf`z]zO ICXfQ~snG
+EXACT I?otRjTz_ ICQTbZqzO
+EXACT I?qffPs~? I?ovFa{~?
+EXACT ICpdepkr_ ICR`thiZO
+EXACT I?qadXYeo I?qadXYYo
+EXACT ICQeeTwNG I?otU`tZ_
+EXACT ICpbdh]n? ICpdbi{V_
+EXACT ICXfUikTw ICpb`zY^_
+EXACT I?qmddrzo ICQbvJT]w
+EXACT ICR`vGy}? ICR`thi}?
+EXACT ICZVDZUzo ICXfUimtw
+EXACT ICpvbvwjw ICrbrr{~_
+EXACT ICpdbj[N_ ICXedrMn?
+EXACT ICOfDpxxw I?qbDpxxw
+EXACT I?ovCxxn_ ICQebriNo
+EXACT ICQrVI{yo ICQrRZi|O
+EXACT ICdedhkY_ ICR`uiwY_
+EXACT ICpbrr{~_ ICRffVwNw
+EXACT ICpb`zLv_ ICpddg}}O
+EXACT I?q`szMNw ICQeN`trw
+EXACT ICZTepfy_ ICpdlpyz?
+EXACT I?qaayifO I?qaayiZO
+EXACT I?qadbE\_ ICOedPwbo
+EXACT ICR`v_z^_ ICR`tjq^O
+EXACT ICQeRrqNo I?qbbq\n_
+EXACT I?qrfRWVO I?qrfRWr_
+EXACT ICZJnNwnW ICrdrruzo
+EXACT I?qvLp}vo ICRbm^wnW
+EXACT ICR`tjWY_ ICR`vGyu?
+EXACT ICQeV`wFg I?ovEa{^?
+EXACT IEjdm^y^W ICzbrj^no
+EXACT ICqna{~~_ I?zUvI~^o
+groups 2187 pairs {'UNEQUAL': 2131, 'EXACT': 58} min_unequal_diff 1.322e-14
+
+real	0m50.293s
+user	3m20.645s
+sys	0m0.165s
